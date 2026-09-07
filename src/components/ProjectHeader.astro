@@ -20,17 +20,17 @@ interface Props {
 const { title, number, pubDate, updatedDate, tags, meta } = Astro.props;
 ---
 
-<header class="project-header">
+<header class='project-header'>
     <Eyebrow>{number ? `Project / ${number}` : 'Notebook entry'}</Eyebrow>
 
-    <h1 class="project-header__title">{title}</h1>
+    <h1 class='project-header__title'>{title}</h1>
 
     {
         pubDate && (
-            <p class="project-header__date">
+            <p class='project-header__date'>
                 <FormattedDate date={pubDate} />
                 {updatedDate && (
-                    <span class="project-header__updated">
+                    <span class='project-header__updated'>
                         {' · updated '}
                         <FormattedDate date={updatedDate} />
                     </span>
@@ -39,8 +39,8 @@ const { title, number, pubDate, updatedDate, tags, meta } = Astro.props;
         )
     }
 
-    {tags && <Tags tags={tags} class="project-header__tags" />}
-    {meta && <MetaTable data={meta} class="project-header__meta" />}
+    {tags && <Tags tags={tags} class='project-header__tags' />}
+    {meta && <MetaTable data={meta} class='project-header__meta' />}
 </header>
 
 <style>

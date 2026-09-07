@@ -28,13 +28,13 @@ const hasHead = Boolean(label || title);
 <aside class:list={['callout', className]} data-variant={variant}>
     {
         hasHead && (
-            <div class="callout__head">
-                {label && <span class="callout__label">{label}</span>}
-                {title && <p class="callout__title">{title}</p>}
+            <div class='callout__head'>
+                {label && <span class='callout__label'>{label}</span>}
+                {title && <p class='callout__title'>{title}</p>}
             </div>
         )
     }
-    <div class="callout__body">
+    <div class='callout__body'>
         <slot />
     </div>
 </aside>

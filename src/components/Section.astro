@@ -25,10 +25,10 @@ const hasHead = Boolean(label || action);
 <section class:list={['section', className]} id={id}>
     {
         hasHead && (
-            <div class="section__head">
+            <div class='section__head'>
                 {label && <Eyebrow>{label}</Eyebrow>}
                 {action && (
-                    <a class="section__action" href={action.href}>
+                    <a class='section__action' href={action.href}>
                         {action.text}
                     </a>
                 )}

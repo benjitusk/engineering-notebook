@@ -6,20 +6,20 @@ import Prose from '../components/Prose.astro';
 import { GITHUB_URL, AUTHOR_EMAIL } from '../consts';
 ---
 
-<BaseLayout title="About · Benji Tusk" description="About Benji Tusk and this engineering notebook." width="prose">
-    <Hero title="About">
-        <Eyebrow slot="eyebrow" tone="accent">Who's writing this</Eyebrow>
-        <Fragment slot="lede">
+<BaseLayout title='About · Benji Tusk' description='About Benji Tusk and this engineering notebook.' width='prose'>
+    <Hero title='About'>
+        <Eyebrow slot='eyebrow' tone='accent'>Who's writing this</Eyebrow>
+        <Fragment slot='lede'>
             I'm Benji — a computer science graduate who likes taking things apart to understand how they work.
         </Fragment>
     </Hero>
 
     <Prose>
         <p>
-            {/* Placeholder copy — edit freely. Written in the notebook's voice: honest, curious, understated. */}
-            Most of what I build starts as a question I can't answer yet. How does this device actually talk to its
-            driver? What is this protocol really doing on the wire? Could I make this run on Linux? I tend to follow
-            those questions further than is strictly reasonable, and this notebook is where the results end up.
+            <!-- Placeholder copy — edit freely. Written in the notebook's voice: honest, curious, understated. -->
+            Most of what I build starts as a question I can't answer yet. How does this device actually talk to its driver?
+            What is this protocol really doing on the wire? Could I make this run on Linux? I tend to follow those questions
+            further than is strictly reasonable, and this notebook is where the results end up.
         </p>
         <p>
             I care more about the process than the polish. A wrong assumption I chased for three days is often more
@@ -35,7 +35,7 @@ import { GITHUB_URL, AUTHOR_EMAIL } from '../consts';
 
         <h2>Get in touch</h2>
         <p>
-            The code lives on <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">GitHub</a>, and you can
+            The code lives on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can
             reach me at <a href={`mailto:${AUTHOR_EMAIL}`}>{AUTHOR_EMAIL}</a>.
         </p>
     </Prose>

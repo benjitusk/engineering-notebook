@@ -23,18 +23,18 @@ const { number, title, href, linkText = 'Read the investigation →', tags, clas
 ---
 
 <article class:list={['featured', className]}>
-    <div class="featured__top">
-        {number && <p class="featured__number">{number}</p>}
-        <h2 class="featured__title">
+    <div class='featured__top'>
+        {number && <p class='featured__number'>{number}</p>}
+        <h2 class='featured__title'>
             <a href={href}>{title}</a>
         </h2>
-        <div class="featured__blurb">
+        <div class='featured__blurb'>
             <slot />
         </div>
-        {tags && <Tags tags={tags} class="featured__tags" />}
+        {tags && <Tags tags={tags} class='featured__tags' />}
     </div>
 
-    <a href={href} class="featured__link">{linkText}</a>
+    <a href={href} class='featured__link'>{linkText}</a>
 </article>
 
 <style>

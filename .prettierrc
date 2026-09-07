@@ -1,4 +1,5 @@
 {
+    "plugins": ["prettier-plugin-astro"],
     "trailingComma": "es5",
     "semi": true,
     "useTabs": false,
@@ -7,7 +8,7 @@
     "bracketSpacing": true,
     "arrowParens": "always",
     "bracketSameLine": false,
-    "jsxSingleQuote": false,
+    "jsxSingleQuote": true,
     "singleQuote": true,
     "quoteProps": "consistent",
     "printWidth": 120

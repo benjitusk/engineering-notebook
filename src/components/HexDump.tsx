@@ -107,7 +107,9 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
 
     const status =
         active !== null && bytes[active] !== undefined
-            ? `offset 0x${toHex(startOffset + active, offsetWidth)} · byte 0x${toHex(bytes[active], 2)} · ${bytes[active]} · '${toGlyph(bytes[active])}'`
+            ? `offset 0x${toHex(startOffset + active, offsetWidth)} · byte 0x${toHex(bytes[active], 2)} · ${
+                  bytes[active]
+              } · '${toGlyph(bytes[active])}'`
             : `${bytes.length} bytes · hover or focus a byte`;
 
     if (bytes.length === 0) {
@@ -119,12 +121,12 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
             <div
                 ref={containerRef}
                 className={styles.grid}
-                role="grid"
-                aria-label="Hex dump"
+                role='grid'
+                aria-label='Hex dump'
                 onKeyDown={onKeyDown}
                 onMouseLeave={() => setActive(null)}
             >
-                <div className={styles.headerRow} aria-hidden="true">
+                <div className={styles.headerRow} aria-hidden='true'>
                     <span className={styles.offset} />
                     <div className={styles.hex}>
                         {Array.from({ length: bytesPerRow }, (_, i) => (
@@ -138,7 +140,7 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
                 {rows.map((row, rowIndex) => {
                     const base = rowIndex * bytesPerRow;
                     return (
-                        <div key={base} className={styles.row} role="row">
+                        <div key={base} className={styles.row} role='row'>
                             <span className={styles.offset}>{toHex(startOffset + base, offsetWidth)}</span>
 
                             <div className={styles.hex}>
@@ -149,7 +151,7 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
                                             <span
                                                 key={index}
                                                 className={`${styles.byte} ${styles.pad}`}
-                                                aria-hidden="true"
+                                                aria-hidden='true'
                                             />
                                         );
                                     }
@@ -157,11 +159,14 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
                                     return (
                                         <button
                                             key={index}
-                                            type="button"
+                                            type='button'
                                             data-byte={index}
                                             className={`${styles.byte} ${isActive ? styles.active : ''}`}
                                             tabIndex={tabIndexFor(index)}
-                                            aria-label={`Offset ${toHex(startOffset + index, offsetWidth)}, value ${toHex(byte, 2)}`}
+                                            aria-label={`Offset ${toHex(
+                                                startOffset + index,
+                                                offsetWidth
+                                            )}, value ${toHex(byte, 2)}`}
                                             onMouseEnter={() => setActive(index)}
                                             onFocus={() => setActive(index)}
                                         >
@@ -179,7 +184,7 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
                                             <span
                                                 key={index}
                                                 className={`${styles.glyph} ${styles.pad}`}
-                                                aria-hidden="true"
+                                                aria-hidden='true'
                                             />
                                         );
                                     }
@@ -198,7 +203,7 @@ export function HexDump({ data, bytesPerRow = 16, startOffset = 0, caption }: He
                 })}
             </div>
 
-            <figcaption className={styles.status} aria-live="polite">
+            <figcaption className={styles.status} aria-live='polite'>
                 {status}
             </figcaption>
             {caption && <figcaption className={styles.caption}>{caption}</figcaption>}

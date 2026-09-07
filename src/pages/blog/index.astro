@@ -13,10 +13,14 @@ const posts = (await getCollection('blog'))
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<BaseLayout title={`Projects · ${SITE_TITLE}`} description="Projects, experiments, and investigations from the notebook." width="page">
-    <Hero title="Projects">
-        <Eyebrow slot="eyebrow" tone="accent">The notebook</Eyebrow>
-        <Fragment slot="lede">
+<BaseLayout
+    title={`Projects · ${SITE_TITLE}`}
+    description='Projects, experiments, and investigations from the notebook.'
+    width='page'
+>
+    <Hero title='Projects'>
+        <Eyebrow slot='eyebrow' tone='accent'>The notebook</Eyebrow>
+        <Fragment slot='lede'>
             Every investigation I've written up — reverse engineering, Linux software, hardware experiments, and the
             occasional rabbit hole.
         </Fragment>

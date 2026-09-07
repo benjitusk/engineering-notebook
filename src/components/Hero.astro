@@ -21,17 +21,25 @@ const hasLede = Astro.slots.has('lede');
 ---
 
 <section class:list={['hero', className]}>
-    {hasEyebrow && <div class="hero__eyebrow"><slot name="eyebrow" /></div>}
+    {
+        hasEyebrow && (
+            <div class='hero__eyebrow'>
+                <slot name='eyebrow' />
+            </div>
+        )
+    }
 
-    <h1 class="hero__title">{title ?? <slot name="title" />}</h1>
+    <h1 class='hero__title'>{title ?? <slot name='title' />}</h1>
 
-    {hasLede && (
-        <div class="hero__lede">
-            <slot name="lede" />
-        </div>
-    )}
+    {
+        hasLede && (
+            <div class='hero__lede'>
+                <slot name='lede' />
+            </div>
+        )
+    }
 
-    <div class="hero__body">
+    <div class='hero__body'>
         <slot />
     </div>
 </section>

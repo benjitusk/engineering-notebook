@@ -4,12 +4,12 @@ import { AUTHOR_NAME, GITHUB_URL, RSS_PATH, AUTHOR_EMAIL } from '../consts';
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
-    <div class="site-footer__inner">
-        <p class="site-footer__copy">&copy; {year} {AUTHOR_NAME}</p>
+<footer class='site-footer'>
+    <div class='site-footer__inner'>
+        <p class='site-footer__copy'>&copy; {year} {AUTHOR_NAME}</p>
 
-        <nav class="site-footer__links" aria-label="Footer">
-            <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">GitHub</a>
+        <nav class='site-footer__links' aria-label='Footer'>
+            <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>
             <a href={RSS_PATH}>RSS</a>
             <a href={`mailto:${AUTHOR_EMAIL}`}>Email</a>
         </nav>

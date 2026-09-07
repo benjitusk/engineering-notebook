@@ -19,9 +19,9 @@ const rows = Object.entries(data);
     rows.length > 0 && (
         <dl class:list={['meta', className]}>
             {rows.map(([label, value]) => (
-                <div class="meta__row">
-                    <dt class="meta__label">{label}</dt>
-                    <dd class="meta__value">{value}</dd>
+                <div class='meta__row'>
+                    <dt class='meta__label'>{label}</dt>
+                    <dd class='meta__value'>{value}</dd>
                 </div>
             ))}
         </dl>

@@ -15,7 +15,7 @@ const { tags = [], class: className } = Astro.props;
     tags.length > 0 && (
         <ul class:list={['tags', className]}>
             {tags.map((tag) => (
-                <li class="tags__item">{tag}</li>
+                <li class='tags__item'>{tag}</li>
             ))}
         </ul>
     )

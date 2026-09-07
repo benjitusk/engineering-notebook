@@ -22,8 +22,8 @@ const { src, alt = '', caption, width, height, class: className } = Astro.props;
 ---
 
 <figure class:list={['figure', className]}>
-    {src ? <Image src={src} alt={alt} width={width} height={height} class="figure__image" /> : <slot />}
-    {caption && <figcaption class="figure__caption">{caption}</figcaption>}
+    {src ? <Image src={src} alt={alt} width={width} height={height} class='figure__image' /> : <slot />}
+    {caption && <figcaption class='figure__caption'>{caption}</figcaption>}
 </figure>
 
 <style>

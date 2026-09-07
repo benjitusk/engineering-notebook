@@ -10,10 +10,10 @@ import Prose from '../components/Prose.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} width="page">
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} width='page'>
     <Hero title="I like building things I don't know how to build yet.">
-        <Eyebrow slot="eyebrow" tone="accent">Engineering Notebook · 2026</Eyebrow>
-        <Fragment slot="lede">
+        <Eyebrow slot='eyebrow' tone='accent'>Engineering Notebook · 2026</Eyebrow>
+        <Fragment slot='lede'>
             I'm Benji, a computer science graduate who likes figuring out how things work. I build things, take them
             apart, sometimes fix them, and occasionally get lost down a rabbit hole.
         </Fragment>
@@ -24,11 +24,11 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         </p>
     </Hero>
 
-    <Section label="Currently investigating">
+    <Section label='Currently investigating'>
         <FeaturedProject
-            number="01"
-            title="Reverse engineering a Windows Hello fingerprint reader"
-            href="/blog/fingerprint-reader"
+            number='01'
+            title='Reverse engineering a Windows Hello fingerprint reader'
+            href='/blog/fingerprint-reader'
             tags={['Reverse engineering', 'Linux', 'I²C', 'USB']}
         >
             I wanted to use a fingerprint reader designed for Windows Hello on Linux, so I'm figuring out how the
@@ -36,18 +36,18 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         </FeaturedProject>
     </Section>
 
-    <Section label="Recent investigations" action={{ href: '/blog', text: 'View all →' }}>
+    <Section label='Recent investigations' action={{ href: '/blog', text: 'View all →' }}>
         <ProjectList>
-            <ProjectListItem number="02" title="Learning Vim" href="/blog">
+            <ProjectListItem number='02' title='Learning Vim' href='/blog'>
                 Rebuilding my editing workflow around Vim and finding out which parts of the hype actually hold up.
             </ProjectListItem>
-            <ProjectListItem number="03" title="More things I'm figuring out" href="/blog">
+            <ProjectListItem number='03' title="More things I'm figuring out" href='/blog'>
                 Small experiments, technical rabbit holes, and projects that don't quite fit anywhere else.
             </ProjectListItem>
         </ProjectList>
     </Section>
 
-    <Section label="Why I keep a notebook">
+    <Section label='Why I keep a notebook'>
         <Prose>
             <h2>The interesting part isn't always the finished project.</h2>
             <p>
