@@ -1,49 +1,64 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseLayout from '../components/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Section from '../components/Section.astro';
+import FeaturedProject from '../components/FeaturedProject.astro';
+import ProjectList from '../components/ProjectList.astro';
+import ProjectListItem from '../components/ProjectListItem.astro';
+import Prose from '../components/Prose.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} width="page">
+    <Hero title="I like building things I don't know how to build yet.">
+        <Eyebrow slot="eyebrow" tone="accent">Engineering Notebook · 2026</Eyebrow>
+        <Fragment slot="lede">
+            I'm Benji, a computer science graduate who likes figuring out how things work. I build things, take them
+            apart, sometimes fix them, and occasionally get lost down a rabbit hole.
+        </Fragment>
+        <p>
+            This is my engineering notebook: a collection of projects, experiments, and things I've learned along the
+            way — from reverse engineering hardware and writing Linux software to learning new tools just to see what
+            they're capable of.
+        </p>
+    </Hero>
+
+    <Section label="Currently investigating">
+        <FeaturedProject
+            number="01"
+            title="Reverse engineering a Windows Hello fingerprint reader"
+            href="/blog/fingerprint-reader"
+            tags={['Reverse engineering', 'Linux', 'I²C', 'USB']}
+        >
+            I wanted to use a fingerprint reader designed for Windows Hello on Linux, so I'm figuring out how the
+            hardware communicates, what the Windows driver is doing, and what it would take to support it properly.
+        </FeaturedProject>
+    </Section>
+
+    <Section label="Recent investigations" action={{ href: '/blog', text: 'View all →' }}>
+        <ProjectList>
+            <ProjectListItem number="02" title="Learning Vim" href="/blog">
+                Rebuilding my editing workflow around Vim and finding out which parts of the hype actually hold up.
+            </ProjectListItem>
+            <ProjectListItem number="03" title="More things I'm figuring out" href="/blog">
+                Small experiments, technical rabbit holes, and projects that don't quite fit anywhere else.
+            </ProjectListItem>
+        </ProjectList>
+    </Section>
+
+    <Section label="Why I keep a notebook">
+        <Prose>
+            <h2>The interesting part isn't always the finished project.</h2>
+            <p>
+                I learn best by trying to build something. The finished result is only one part of the process — the
+                failed experiments, wrong assumptions, debugging sessions, and little discoveries along the way are
+                often where I learn the most.
+            </p>
+            <p>
+                So I write them down. Partly to make sense of what I've learned, and partly because I think the process
+                of figuring something out is worth sharing.
+            </p>
+        </Prose>
+    </Section>
+</BaseLayout>

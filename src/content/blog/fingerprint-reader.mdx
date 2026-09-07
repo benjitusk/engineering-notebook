@@ -1,0 +1,82 @@
+---
+title: Reverse engineering a Windows Hello fingerprint reader
+description: Getting a Windows-only fingerprint sensor talking to Linux — the captures, the wrong turns, and where it stands.
+pubDate: 2026-08-20
+number: '01'
+status: Working prototype
+tags: ['Reverse engineering', 'Linux', 'I²C', 'USB', 'Rust']
+meta:
+    Status: Working prototype
+    Platform: Linux
+    Language: Rust
+    Hardware: I²C / USB
+heroImage: ../../assets/blog-placeholder-3.jpg
+---
+
+import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+import { HexDump } from '../../components/HexDump.tsx';
+
+## The problem
+
+My laptop has a fingerprint reader that works beautifully in Windows Hello and not at all in Linux.
+There's no driver, no `libfprint` support, and no documentation. I wanted to know what it would take
+to change that — which mostly meant finding out what the device actually does when Windows talks to it.
+
+## Looking at the hardware
+
+The sensor shows up as a USB device, but internally it bridges to an I²C part. That split matters: the
+interesting traffic is I²C wrapped inside USB control transfers, so a naive USB capture shows framing,
+not payloads.
+
+<Figure caption="lsusb, once the sensor enumerates. The bridge sits behind this single USB interface.">
+    <pre>{`$ lsusb -d 27c6:
+Bus 003 Device 006: ID 27c6:5395 Fingerprint Sensor
+  bInterfaceClass  255 Vendor Specific
+  bNumEndpoints      2  (1 bulk-in, 1 interrupt-in)`}</pre>
+</Figure>
+
+## Capturing I²C traffic
+
+With the sensor initialised, the first exchange looks like this — a short init packet, then a status
+reply. Hover a byte to line it up with its ASCII:
+
+<HexDump
+    client:visible
+    data="53 46 3A 01 00 12 A0 FF 00 01 02 03 04 05 06 07 6B 65 79 3D 33 46 00 90"
+    caption="Init request (bytes 0x00–0x0F) followed by the device's status reply."
+/>
+
+The `53 46 3A` prefix (`SF:`) shows up on every frame, so it's almost certainly a magic header rather
+than data. That gave me a frame boundary to work from.
+
+## What I got wrong
+
+<Callout variant="failed" label="Experiment 04 · Failed" title="I spent three days looking at the wrong bus.">
+    I was convinced the payload rode on the USB interrupt endpoint, because that's where the timing lined
+    up. It didn't. The interrupt endpoint only carried "data ready" notifications — the real bytes came
+    back over a control transfer I'd been ignoring the whole time.
+</Callout>
+
+Once I stopped trusting the timing and started trusting the frame header, the protocol fell out quickly.
+
+<Callout variant="discovery" label="Discovery" title="The status byte is a bitfield, not an enum.">
+    Bit 0 is "sensor present", bit 1 is "image ready", bit 7 is "error". I'd been reading it as a single
+    status code, which is why half my captures looked contradictory.
+</Callout>
+
+## Where it stands
+
+There's a small Rust program that can initialise the sensor, request a scan, and pull back a raw image.
+Enrollment and matching aren't done, and I haven't touched `libfprint` integration yet.
+
+<Callout variant="warning" title="Not production-ready.">
+    This talks to one specific sensor revision. Don't point it at your own hardware expecting it to work —
+    the framing is almost certainly different.
+</Callout>
+
+## What's next
+
+- Wire the raw image path into `libfprint` so the desktop actually uses it.
+- Work out enrollment, which needs multiple captures stitched together.
+- Figure out what the last four bytes of each frame are. I think it's a checksum. I've been wrong before.

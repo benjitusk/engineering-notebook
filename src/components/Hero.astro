@@ -1,0 +1,83 @@
+---
+/**
+ * Hero — the opening statement of a page. A big typographic heading with an
+ * optional eyebrow, an optional emphasised lede, and body copy.
+ *
+ * <Hero title="I like building things I don't know how to build yet.">
+ *   <Eyebrow slot="eyebrow" tone="accent">Engineering Notebook · 2026</Eyebrow>
+ *   <Fragment slot="lede">I'm Benji, a computer science graduate…</Fragment>
+ *   <p>This is my engineering notebook: …</p>
+ * </Hero>
+ */
+interface Props {
+    /** The headline. Or omit and pass a "title" slot for rich markup. */
+    title?: string;
+    class?: string;
+}
+
+const { title, class: className } = Astro.props;
+const hasEyebrow = Astro.slots.has('eyebrow');
+const hasLede = Astro.slots.has('lede');
+---
+
+<section class:list={['hero', className]}>
+    {hasEyebrow && <div class="hero__eyebrow"><slot name="eyebrow" /></div>}
+
+    <h1 class="hero__title">{title ?? <slot name="title" />}</h1>
+
+    {hasLede && (
+        <div class="hero__lede">
+            <slot name="lede" />
+        </div>
+    )}
+
+    <div class="hero__body">
+        <slot />
+    </div>
+</section>
+
+<style>
+    .hero {
+        max-width: 760px;
+        margin-bottom: var(--space-36);
+    }
+
+    .hero__eyebrow {
+        margin-bottom: var(--space-6);
+    }
+
+    .hero__title {
+        margin: 0;
+        font-size: var(--display-hero);
+        line-height: 0.98;
+        letter-spacing: var(--tracking-tighter);
+        font-weight: var(--weight-bold);
+    }
+
+    .hero__lede {
+        max-width: 680px;
+        margin-top: var(--space-8);
+        color: var(--text);
+        font-size: var(--text-xl);
+        line-height: var(--leading-snug);
+    }
+
+    .hero__body {
+        max-width: 680px;
+        margin-top: var(--space-6);
+        color: var(--text-muted);
+        font-size: var(--text-lg);
+        line-height: var(--leading-relaxed);
+    }
+
+    /* Spacing between body paragraphs, without the author touching CSS. */
+    .hero__body :global(p + p) {
+        margin-top: var(--space-4);
+    }
+
+    @media (max-width: 600px) {
+        .hero {
+            margin-bottom: var(--space-24);
+        }
+    }
+</style>

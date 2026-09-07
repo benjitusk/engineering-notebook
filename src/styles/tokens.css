@@ -1,0 +1,148 @@
+/*
+ * Design tokens — the single source of truth for the whole site.
+ *
+ * Rule of thumb: nothing outside this file should contain a raw hex colour,
+ * a raw px length, or a magic number. Everything references a token below.
+ * See docs/STYLEGUIDE.md for how these are meant to be used.
+ *
+ * The palette is deliberately small (brief §13): warm paper, charcoal ink,
+ * one blueprint-blue accent, and one amber reserved for failed experiments.
+ */
+
+:root {
+    /* ---- Palette: paper ------------------------------------------------ */
+    --background: #f7f7f5; /* the page / paper                              */
+    --surface: #ffffff; /* raised cards, panels, highlighted areas          */
+
+    /* ---- Palette: ink -------------------------------------------------- */
+    --text: #181a1b; /* primary ink, headings                              */
+    --text-muted: #686d70; /* body copy, secondary text                    */
+    --text-subtle: #969b9e; /* metadata, captions, de-emphasised           */
+
+    /* ---- Palette: structure ------------------------------------------- */
+    --border: #dcddd9; /* hairline dividers, most borders                  */
+    --border-strong: #c5c7c3; /* emphasised borders                        */
+
+    /* ---- Palette: accent (blueprint blue) ----------------------------- */
+    /* Meaning: discovery, implementation, links. Never the default text.  */
+    --accent: #356a8a;
+    --accent-hover: #28546e;
+    --accent-subtle: #e7eff3; /* pale wash behind accented surfaces        */
+
+    /* ---- Palette: warning (amber) ------------------------------------- */
+    /* Meaning: failed experiments, warnings, unexpected results. ONLY.    */
+    --warning: #a66a24;
+    --warning-subtle: #f5ebdd;
+
+    /* ---- Palette: code / technical surfaces --------------------------- */
+    --code-background: #ecedea;
+
+    /* ---- Notebook grid (consumed by notebook.css) --------------------- */
+    --grid-line: rgba(53, 106, 138, 0.035); /* 32px major grid             */
+    --grid-line-faint: rgba(53, 106, 138, 0.015); /* 8px minor grid        */
+
+    /* ---- Typography: families ----------------------------------------- */
+    /* IBM Plex — one engineered family doing everything; mono for anything
+       technical (eyebrows, tags, metadata, code, numbers). Wired in
+       astro.config.mjs; the --font-plex-* vars come from Astro's font API. */
+    --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-plex-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* ---- Typography: scale -------------------------------------------- */
+    --text-2xs: 0.6875rem; /* 11px — micro labels                          */
+    --text-xs: 0.75rem; /* 12px — mono metadata, tags                      */
+    --text-sm: 0.875rem; /* 14px — nav, small UI                           */
+    --text-base: 1rem; /* 16px                                             */
+    --text-md: 1.125rem; /* 18px — body default                            */
+    --text-lg: 1.25rem; /* 20px — lede / large body                        */
+    --text-xl: 1.5rem; /* 24px                                             */
+    --text-2xl: 1.875rem; /* 30px                                          */
+    --text-3xl: 2.25rem; /* 36px                                           */
+    /* Fluid display sizes for hero / section headings */
+    --display-lg: clamp(1.8rem, 4vw, 2.5rem);
+    --display-hero: clamp(2.75rem, 7vw, 5.5rem);
+
+    /* ---- Typography: weights ------------------------------------------ */
+    /* IBM Plex Sans ships 400/500/600/700, and Plex Mono 400/500/600 —
+       all four are real (loaded in astro.config.mjs), so use them freely. */
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    /* ---- Typography: line-height -------------------------------------- */
+    --leading-none: 1;
+    --leading-tight: 1.1;
+    --leading-snug: 1.25;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.7;
+
+    /* ---- Typography: letter-spacing ----------------------------------- */
+    --tracking-tighter: -0.045em; /* hero display                          */
+    --tracking-tight: -0.02em; /* headings                                 */
+    --tracking-normal: 0;
+    --tracking-wide: 0.1em;
+    --tracking-wider: 0.15em; /* eyebrows / mono labels                    */
+    --tracking-widest: 0.2em; /* branding subtitle                         */
+
+    /* ---- Spacing: scale (token N == N × 0.25rem) ---------------------- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-24: 6rem;
+    --space-32: 8rem;
+    --space-36: 9rem;
+
+    /* ---- Radii (kept small — this is a notebook, not a SaaS app) ------ */
+    --radius-sm: 2px;
+    --radius: 4px;
+    --radius-md: 8px;
+
+    /* ---- Borders ------------------------------------------------------ */
+    --border-width: 1px;
+
+    /* ---- Motion ------------------------------------------------------- */
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --duration-fast: 150ms;
+    --duration: 180ms;
+
+    /* ---- Layout ------------------------------------------------------- */
+    --measure-prose: 720px; /* long-form reading column                    */
+    --measure-page: 900px; /* default page column                          */
+    --measure-wide: 1100px; /* header + wide layouts                        */
+    --gutter: 1.5rem; /* page horizontal padding                           */
+
+    /* ---- Stacking ----------------------------------------------------- */
+    --z-header: 50;
+}
+
+/*
+ * Dark theme — intentionally not shipped yet (brief is a warm-paper light
+ * design). The tokens above are all semantic, so a dark theme drops in here
+ * with no changes anywhere else. Uncomment + tune when wanted.
+ *
+ * @media (prefers-color-scheme: dark) {
+ *     :root:not([data-theme='light']) {
+ *         --background: #16181a;
+ *         --surface: #1e2124;
+ *         --text: #f2f3f2;
+ *         --text-muted: #a8adb0;
+ *         --text-subtle: #7c8184;
+ *         --border: #2c2f31;
+ *         --border-strong: #3a3e40;
+ *         --accent: #6fa3c2;
+ *         --accent-hover: #8fbcd6;
+ *         --accent-subtle: #1d2a33;
+ *         --warning: #d29a5b;
+ *         --warning-subtle: #2c2519;
+ *         --code-background: #232629;
+ *         --grid-line: rgba(111, 163, 194, 0.05);
+ *         --grid-line-faint: rgba(111, 163, 194, 0.025);
+ *     }
+ * }
+ */

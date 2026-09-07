@@ -1,0 +1,43 @@
+---
+import { AUTHOR_NAME, BRAND_SUBTITLE } from '../consts';
+
+/**
+ * Branding — the top-left identity. The name is itself the home link, so this
+ * must not be wrapped in another <a>. Name + subordinate mono subtitle.
+ */
+---
+
+<a class="branding" href="/" aria-label={`${AUTHOR_NAME} — home`}>
+    <span class="branding__name">{AUTHOR_NAME}</span>
+    <span class="branding__subtitle">{BRAND_SUBTITLE}</span>
+</a>
+
+<style>
+    .branding {
+        display: inline-flex;
+        flex-direction: column;
+        line-height: var(--leading-none);
+        text-decoration: none;
+    }
+
+    .branding__name {
+        color: var(--text);
+        font-size: var(--text-md);
+        font-weight: var(--weight-bold);
+        letter-spacing: var(--tracking-tight);
+        transition: color var(--duration-fast) var(--ease);
+    }
+    .branding:hover .branding__name {
+        color: var(--text-muted);
+    }
+
+    .branding__subtitle {
+        margin-top: var(--space-1);
+        color: var(--text-subtle);
+        font-family: var(--font-mono);
+        font-size: var(--text-2xs);
+        font-weight: var(--weight-medium);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-widest);
+    }
+</style>

@@ -1,0 +1,46 @@
+/*
+ * The engineering-notebook background: a very subtle graph-paper grid with a
+ * soft vignette that keeps the centre of the page clean. It should read as
+ * texture, not decoration — if the first thing you notice is "oh, a grid!",
+ * it's too strong (brief §11). Both layers are fixed and non-interactive.
+ */
+
+body {
+    position: relative;
+}
+
+/* Graph paper: a 32px major grid over a fainter 8px minor grid. */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(var(--grid-line-faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line-faint) 1px, transparent 1px);
+    background-size:
+        32px 32px,
+        32px 32px,
+        8px 8px,
+        8px 8px;
+}
+
+/* Vignette fading to the paper colour, so the grid never crowds the content. */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background: radial-gradient(
+        ellipse at center,
+        transparent 20%,
+        color-mix(in srgb, var(--background) 75%, transparent) 80%,
+        var(--background) 100%
+    );
+}

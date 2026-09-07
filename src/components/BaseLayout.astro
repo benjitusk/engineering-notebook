@@ -1,0 +1,58 @@
+---
+import type { ImageMetadata } from 'astro';
+import BaseHead from './BaseHead.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+
+/**
+ * BaseLayout — the single page shell (document, head, header, footer). Every
+ * page renders its content into the default slot; pick a column width to fit
+ * the content: 'prose' for reading, 'page' (default) for composed pages,
+ * 'wide' for edge-to-edge layouts.
+ */
+interface Props {
+    title: string;
+    description: string;
+    image?: ImageMetadata;
+    width?: 'prose' | 'page' | 'wide';
+}
+
+const { title, description, image, width = 'page' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <BaseHead title={title} description={description} image={image} />
+    </head>
+    <body>
+        <Header />
+        <main class="page" data-width={width}>
+            <slot />
+        </main>
+        <Footer />
+    </body>
+</html>
+
+<style>
+    .page {
+        width: 100%;
+        margin-inline: auto;
+        padding: var(--space-24) var(--gutter) var(--space-32);
+    }
+    .page[data-width='prose'] {
+        max-width: var(--measure-prose);
+    }
+    .page[data-width='page'] {
+        max-width: var(--measure-page);
+    }
+    .page[data-width='wide'] {
+        max-width: var(--measure-wide);
+    }
+
+    @media (max-width: 600px) {
+        .page {
+            padding-top: var(--space-16);
+        }
+    }
+</style>

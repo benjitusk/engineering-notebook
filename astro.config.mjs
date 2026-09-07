@@ -6,39 +6,39 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 import react from '@astrojs/react';
 
-import tailwindcss from '@tailwindcss/vite';
-
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
-  integrations: [mdx(), sitemap(), react()],
+    site: 'https://example.com',
+    integrations: [mdx(), sitemap(), react()],
 
-  fonts: [
-      {
-          provider: fontProviders.local(),
-          name: 'Atkinson',
-          cssVariable: '--font-atkinson',
-          fallbacks: ['sans-serif'],
-          options: {
-              variants: [
-                  {
-                      src: ['./src/assets/fonts/atkinson-regular.woff'],
-                      weight: 400,
-                      style: 'normal',
-                      display: 'swap',
-                  },
-                  {
-                      src: ['./src/assets/fonts/atkinson-bold.woff'],
-                      weight: 700,
-                      style: 'normal',
-                      display: 'swap',
-                  },
-              ],
-          },
-      },
-  ],
+    // Code fences are highlighted with Shiki; a light theme reads as an
+    // intentional capture on the paper background (Prose owns the surface).
+    markdown: {
+        shikiConfig: {
+            theme: 'github-light',
+            wrap: false,
+        },
+    },
 
-  vite: {
-    plugins: [tailwindcss()],
-  },
+    // Self-hosted via Astro's font pipeline (fetched at build, served locally).
+    fonts: [
+        {
+            provider: fontProviders.google(),
+            name: 'IBM Plex Sans',
+            cssVariable: '--font-plex-sans',
+            weights: [400, 500, 600, 700],
+            styles: ['normal'],
+            subsets: ['latin'],
+            fallbacks: ['system-ui', 'sans-serif'],
+        },
+        {
+            provider: fontProviders.google(),
+            name: 'IBM Plex Mono',
+            cssVariable: '--font-plex-mono',
+            weights: [400, 500, 600],
+            styles: ['normal'],
+            subsets: ['latin'],
+            fallbacks: ['ui-monospace', 'monospace'],
+        },
+    ],
 });

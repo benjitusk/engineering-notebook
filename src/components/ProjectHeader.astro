@@ -1,0 +1,72 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import FormattedDate from './FormattedDate.astro';
+import MetaTable from './MetaTable.astro';
+import Tags from './Tags.astro';
+
+/**
+ * ProjectHeader — the masthead of a project / notebook entry. Fed from post
+ * frontmatter (see src/content.config.ts) by the BlogPost layout.
+ */
+interface Props {
+    title: string;
+    number?: string;
+    pubDate?: Date;
+    updatedDate?: Date;
+    tags?: string[];
+    meta?: Record<string, string>;
+}
+
+const { title, number, pubDate, updatedDate, tags, meta } = Astro.props;
+---
+
+<header class="project-header">
+    <Eyebrow>{number ? `Project / ${number}` : 'Notebook entry'}</Eyebrow>
+
+    <h1 class="project-header__title">{title}</h1>
+
+    {
+        pubDate && (
+            <p class="project-header__date">
+                <FormattedDate date={pubDate} />
+                {updatedDate && (
+                    <span class="project-header__updated">
+                        {' · updated '}
+                        <FormattedDate date={updatedDate} />
+                    </span>
+                )}
+            </p>
+        )
+    }
+
+    {tags && <Tags tags={tags} class="project-header__tags" />}
+    {meta && <MetaTable data={meta} class="project-header__meta" />}
+</header>
+
+<style>
+    .project-header {
+        margin-bottom: var(--space-12);
+    }
+
+    .project-header__title {
+        margin: var(--space-3) 0 0;
+        font-size: var(--display-lg);
+        line-height: var(--leading-tight);
+        letter-spacing: var(--tracking-tight);
+    }
+
+    .project-header__date {
+        margin: var(--space-4) 0 0;
+        color: var(--text-subtle);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+    }
+
+    .project-header__tags {
+        margin-top: var(--space-4);
+    }
+
+    .project-header__meta {
+        margin-top: var(--space-6);
+    }
+</style>

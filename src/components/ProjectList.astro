@@ -1,0 +1,29 @@
+---
+/**
+ * ProjectList — a numbered list of investigations. Wraps ProjectListItem
+ * children. Items auto-number (01, 02, 03…) unless an item sets `number`.
+ *
+ * <ProjectList>
+ *   <ProjectListItem title="Learning Vim" href="/blog/learning-vim">
+ *     Rebuilding my editing workflow around Vim…
+ *   </ProjectListItem>
+ * </ProjectList>
+ */
+interface Props {
+    class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<ol class:list={['project-list', className]}>
+    <slot />
+</ol>
+
+<style>
+    .project-list {
+        margin: 0;
+        border-top: var(--border-width) solid var(--border);
+        counter-reset: investigation;
+    }
+</style>

@@ -1,0 +1,103 @@
+---
+import Tags from './Tags.astro';
+
+/**
+ * FeaturedProject — the "currently investigating" card. A prominent surface
+ * with a project number, title, blurb (slot), optional tags, and a CTA link.
+ *
+ * <FeaturedProject number="01" title="Reverse engineering a fingerprint reader"
+ *   href="/blog/fingerprint-reader" tags={['Linux', 'I²C', 'USB']}>
+ *   I wanted to use a Windows Hello fingerprint reader on Linux…
+ * </FeaturedProject>
+ */
+interface Props {
+    number?: string;
+    title: string;
+    href: string;
+    linkText?: string;
+    tags?: string[];
+    class?: string;
+}
+
+const { number, title, href, linkText = 'Read the investigation →', tags, class: className } = Astro.props;
+---
+
+<article class:list={['featured', className]}>
+    <div class="featured__top">
+        {number && <p class="featured__number">{number}</p>}
+        <h2 class="featured__title">
+            <a href={href}>{title}</a>
+        </h2>
+        <div class="featured__blurb">
+            <slot />
+        </div>
+        {tags && <Tags tags={tags} class="featured__tags" />}
+    </div>
+
+    <a href={href} class="featured__link">{linkText}</a>
+</article>
+
+<style>
+    .featured {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: var(--space-8);
+        min-height: 300px;
+        padding: var(--space-8);
+        background: var(--surface);
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-sm);
+    }
+
+    .featured__number {
+        margin: 0 0 var(--space-4);
+        color: var(--text-subtle);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+    }
+
+    .featured__title {
+        max-width: 650px;
+        margin: 0 0 var(--space-4);
+        font-size: var(--display-lg);
+        line-height: var(--leading-tight);
+        letter-spacing: var(--tracking-tight);
+    }
+    .featured__title a {
+        color: var(--text);
+        text-decoration: none;
+    }
+    .featured__title a:hover {
+        color: var(--accent);
+    }
+
+    .featured__blurb {
+        max-width: 650px;
+        color: var(--text-muted);
+        line-height: var(--leading-relaxed);
+    }
+
+    .featured__tags {
+        margin-top: var(--space-6);
+    }
+
+    .featured__link {
+        align-self: flex-start;
+        color: var(--accent);
+        font-size: var(--text-sm);
+        font-weight: var(--weight-semibold);
+        text-decoration: none;
+    }
+    .featured__link:hover {
+        color: var(--accent-hover);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+
+    @media (max-width: 600px) {
+        .featured {
+            padding: var(--space-6);
+        }
+    }
+</style>

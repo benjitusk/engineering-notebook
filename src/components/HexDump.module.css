@@ -1,0 +1,125 @@
+/*
+ * Styles for the HexDump island. A CSS Module scopes these class names, but
+ * the *values* all come from the global design tokens — the same palette,
+ * type, and spacing every .astro component uses. This is the canonical way to
+ * style a React island in this project (no Tailwind, no hardcoded colours).
+ */
+
+.dump {
+    margin: 0;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--code-background);
+    overflow: hidden;
+}
+
+.grid {
+    padding: var(--space-4);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    color: var(--text);
+}
+
+.headerRow,
+.row {
+    display: flex;
+    gap: var(--space-4);
+    width: max-content;
+    min-width: 100%;
+}
+
+.headerRow {
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border-width) solid var(--border);
+    color: var(--text-subtle);
+}
+
+.offset {
+    flex: none;
+    min-width: 3.5rem;
+    color: var(--text-subtle);
+    user-select: none;
+}
+
+/* Cell width + gap are in rem (not em) so the header labels and the byte
+   rows share one grid even though the labels are set at a smaller size. */
+.hex,
+.ascii {
+    display: flex;
+    gap: 0.15rem;
+}
+
+.colLabel {
+    width: 1.6rem;
+    text-align: center;
+    font-size: var(--text-xs);
+}
+
+.byte {
+    width: 1.6rem;
+    padding: 0.05em 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color var(--duration-fast) var(--ease),
+        color var(--duration-fast) var(--ease);
+}
+
+.glyph {
+    width: 0.9rem;
+    text-align: center;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+}
+
+.byte.active,
+.glyph.active {
+    background: var(--accent);
+    color: var(--surface);
+}
+
+/* Padding slots: hold the grid rectangle, but carry no data and no behaviour. */
+.pad {
+    background: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+.ascii {
+    padding-left: var(--space-4);
+    border-left: var(--border-width) solid var(--border);
+}
+
+.status {
+    padding: var(--space-2) var(--space-4);
+    border-top: var(--border-width) solid var(--border);
+    background: var(--surface);
+    color: var(--text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+}
+
+.caption {
+    padding: var(--space-2) var(--space-4);
+    border-top: var(--border-width) solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+.empty {
+    padding: var(--space-4);
+    border: var(--border-width) dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    color: var(--text-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}

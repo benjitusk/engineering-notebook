@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../components/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+---
+
+<BaseLayout title="404 · Benji Tusk" description="Page not found." width="prose">
+    <Hero title="This experiment doesn't exist.">
+        <Eyebrow slot="eyebrow" tone="accent">Error 404</Eyebrow>
+        <Fragment slot="lede">
+            The page you're looking for isn't here — it may have moved, or it never made it out of the notebook.
+        </Fragment>
+        <p><a href="/">← Back to the notebook</a></p>
+    </Hero>
+</BaseLayout>

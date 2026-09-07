@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * Figure — a captioned artifact: hardware photo, capture, diagram, or (via
+ * the default slot) arbitrary content like a terminal dump or code block.
+ *
+ * With an image:  <Figure src={photo} alt="…" caption="The sensor, opened up." />
+ * With content:   <Figure caption="i2cdump output"><pre>…</pre></Figure>
+ */
+interface Props {
+    src?: ImageMetadata;
+    alt?: string;
+    caption?: string;
+    width?: number;
+    height?: number;
+    class?: string;
+}
+
+const { src, alt = '', caption, width, height, class: className } = Astro.props;
+---
+
+<figure class:list={['figure', className]}>
+    {src ? <Image src={src} alt={alt} width={width} height={height} class="figure__image" /> : <slot />}
+    {caption && <figcaption class="figure__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+    .figure {
+        margin: 0;
+    }
+
+    .figure__image {
+        width: 100%;
+        height: auto;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-md);
+    }
+
+    .figure__caption {
+        margin-top: var(--space-2);
+        padding-left: var(--space-3);
+        border-left: 2px solid var(--border-strong);
+        color: var(--text-subtle);
+        font-size: var(--text-sm);
+        line-height: var(--leading-snug);
+    }
+</style>

@@ -1,0 +1,103 @@
+---
+/**
+ * Callout — the notebook's semantic annotation block. The variant carries
+ * meaning (brief §14), so pick it by what the note *is*, not by colour:
+ *
+ *   note       charcoal   an observation / aside
+ *   discovery  blue       something found, implemented, or confirmed
+ *   failed     amber      an experiment that didn't work
+ *   warning    amber      a caveat / unexpected behaviour
+ *
+ * <Callout variant="failed" label="Experiment 07 · Failed" title="The device never answered.">
+ *   I sent the command the Windows driver uses. Nothing came back.
+ * </Callout>
+ */
+interface Props {
+    variant?: 'note' | 'discovery' | 'failed' | 'warning';
+    /** Small mono label, e.g. "Experiment 07 · Failed". */
+    label?: string;
+    /** Optional bold lead line. */
+    title?: string;
+    class?: string;
+}
+
+const { variant = 'note', label, title, class: className } = Astro.props;
+const hasHead = Boolean(label || title);
+---
+
+<aside class:list={['callout', className]} data-variant={variant}>
+    {
+        hasHead && (
+            <div class="callout__head">
+                {label && <span class="callout__label">{label}</span>}
+                {title && <p class="callout__title">{title}</p>}
+            </div>
+        )
+    }
+    <div class="callout__body">
+        <slot />
+    </div>
+</aside>
+
+<style>
+    .callout {
+        /* Per-variant locals: --bar (left rule), --tint (wash), --label. */
+        --bar: var(--border-strong);
+        --tint: var(--surface);
+        --label: var(--text-subtle);
+
+        border: var(--border-width) solid var(--border);
+        border-left: 3px solid var(--bar);
+        border-radius: var(--radius-sm);
+        background: var(--tint);
+        padding: var(--space-6) var(--space-8);
+    }
+
+    .callout[data-variant='discovery'] {
+        --bar: var(--accent);
+        --tint: var(--accent-subtle);
+        --label: var(--accent);
+    }
+    .callout[data-variant='failed'],
+    .callout[data-variant='warning'] {
+        --bar: var(--warning);
+        --tint: var(--warning-subtle);
+        --label: var(--warning);
+    }
+
+    .callout__head {
+        margin-bottom: var(--space-3);
+    }
+
+    .callout__label {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        font-weight: var(--weight-semibold);
+        letter-spacing: var(--tracking-wider);
+        text-transform: uppercase;
+        color: var(--label);
+    }
+
+    .callout__title {
+        margin: var(--space-2) 0 0;
+        font-size: var(--text-lg);
+        font-weight: var(--weight-semibold);
+        line-height: var(--leading-snug);
+        color: var(--text);
+    }
+
+    .callout__body {
+        color: var(--text-muted);
+        line-height: var(--leading-relaxed);
+    }
+    .callout__body :global(> :first-child) {
+        margin-top: 0;
+    }
+    .callout__body :global(> :last-child) {
+        margin-bottom: 0;
+    }
+    .callout__body :global(p + p) {
+        margin-top: var(--space-4);
+    }
+</style>

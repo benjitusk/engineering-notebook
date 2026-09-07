@@ -1,0 +1,36 @@
+---
+/**
+ * Panel — a bordered surface primitive. The building block for cards and
+ * other raised areas. Prefer a more specific component (FeaturedProject,
+ * Callout) when one exists; reach for Panel for one-off boxes.
+ */
+interface Props {
+    as?: keyof HTMLElementTagNameMap;
+    /** Interior padding. false removes it (e.g. for media-only panels). */
+    padded?: boolean;
+    class?: string;
+}
+
+const { as: Tag = 'div', padded = true, class: className } = Astro.props;
+---
+
+<Tag class:list={['panel', className]} data-padded={padded}>
+    <slot />
+</Tag>
+
+<style>
+    .panel {
+        background: var(--surface);
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-sm);
+    }
+    .panel[data-padded='true'] {
+        padding: var(--space-8);
+    }
+
+    @media (max-width: 600px) {
+        .panel[data-padded='true'] {
+            padding: var(--space-6);
+        }
+    }
+</style>
