@@ -50,7 +50,7 @@ const auto = number === undefined;
     }
     /* Auto-number: 01, 02, 03… when no explicit number was passed. */
     .pli__num[data-auto='true']::before {
-        content: counter(investigation, decimal-leading-zero);
+        content: var(--counter);
     }
 
     .pli__title {

@@ -8,9 +8,11 @@ import ProjectList from '../../components/ProjectList.astro';
 import ProjectListItem from '../../components/ProjectListItem.astro';
 import { SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('blog'))
+const posts = (await getCollection('projects'))
     .filter((post) => !post.data.draft)
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+
 ---
 
 <BaseLayout
@@ -29,8 +31,12 @@ const posts = (await getCollection('blog'))
     <Section>
         <ProjectList>
             {
-                posts.map((post) => (
-                    <ProjectListItem number={post.data.number} title={post.data.title} href={`/blog/${post.id}/`}>
+                posts.map((post, index) => (
+                    <ProjectListItem
+                        number={post.data.number ?? String(posts.length - index).padStart(2, '0')}
+                        title={post.data.title}
+                        href={`/projects/${post.id}/`}
+                    >
                         {post.data.description}
                     </ProjectListItem>
                 ))

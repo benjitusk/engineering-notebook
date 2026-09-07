@@ -93,7 +93,7 @@ rhythm. Omit `label`/`action` for an unlabelled section.
 | `id`     | `string`                         | Anchor id                      |
 
 ```astro
-<Section label="Recent investigations" action={{ href: '/blog', text: 'View all →' }}>
+<Section label="Recent investigations" action={{ href: '/projects', text: 'View all →' }}>
     …content…
 </Section>
 ```
@@ -173,7 +173,7 @@ The prominent "currently investigating" card.
 
 ```astro
 <FeaturedProject number="01" title="Reverse engineering a fingerprint reader"
-    href="/blog/fingerprint-reader" tags={['Linux', 'I²C', 'USB']}>
+    href="/projects/fingerprint-reader" tags={['Linux', 'I²C', 'USB']}>
     I wanted to use a Windows Hello fingerprint reader on Linux…
 </FeaturedProject>
 ```
@@ -193,7 +193,7 @@ item passes an explicit `number`.
 
 ```astro
 <ProjectList>
-    <ProjectListItem title="Learning Vim" href="/blog/learning-vim">
+    <ProjectListItem title="Learning Vim" href="/projects/learning-vim">
         Rebuilding my editing workflow around Vim.
     </ProjectListItem>
 </ProjectList>
@@ -306,7 +306,7 @@ import FeaturedProject from '../components/FeaturedProject.astro';
     </Hero>
 
     <Section label="Currently investigating">
-        <FeaturedProject number="01" title="…" href="/blog/…" tags={['Linux']}>
+        <FeaturedProject number="01" title="…" href="/projects/…" tags={['Linux']}>
             …blurb…
         </FeaturedProject>
     </Section>
