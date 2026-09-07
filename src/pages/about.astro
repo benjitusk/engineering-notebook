@@ -3,7 +3,8 @@ import BaseLayout from '../components/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Prose from '../components/Prose.astro';
-import { GITHUB_URL, AUTHOR_EMAIL } from '../consts';
+import EmailLink from '../components/EmailLink.astro';
+import { GITHUB_URL } from '../consts';
 ---
 
 <BaseLayout title='About · Benji Tusk' description='About Benji Tusk and this engineering notebook.' width='prose'>
@@ -36,7 +37,7 @@ import { GITHUB_URL, AUTHOR_EMAIL } from '../consts';
         <h2>Get in touch</h2>
         <p>
             The code lives on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can
-            reach me at <a href={`mailto:${AUTHOR_EMAIL}`}>{AUTHOR_EMAIL}</a>.
+            reach me at <EmailLink />.
         </p>
     </Prose>
 </BaseLayout>

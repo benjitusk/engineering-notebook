@@ -1,5 +1,6 @@
 ---
-import { AUTHOR_NAME, GITHUB_URL, RSS_PATH, AUTHOR_EMAIL } from '../consts';
+import { AUTHOR_NAME, GITHUB_URL, RSS_PATH } from '../consts';
+import EmailLink from './EmailLink.astro';
 
 const year = new Date().getFullYear();
 ---
@@ -11,7 +12,7 @@ const year = new Date().getFullYear();
         <nav class='site-footer__links' aria-label='Footer'>
             <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>
             <a href={RSS_PATH}>RSS</a>
-            <a href={`mailto:${AUTHOR_EMAIL}`}>Email</a>
+            <EmailLink label='Email' />
         </nav>
     </div>
 </footer>
@@ -44,13 +45,16 @@ const year = new Date().getFullYear();
         display: flex;
         gap: var(--space-6);
     }
-    .site-footer__links a {
+    /* :global(a) so the rule also reaches the <a> rendered by <EmailLink />,
+       which carries that component's scope id rather than the footer's.
+       Constrained under the scoped .site-footer__links parent, so it can't leak. */
+    .site-footer__links :global(a) {
         color: var(--text-muted);
         font-size: var(--text-sm);
         text-decoration: none;
         transition: color var(--duration-fast) var(--ease);
     }
-    .site-footer__links a:hover {
+    .site-footer__links :global(a:hover) {
         color: var(--text);
     }
 </style>
