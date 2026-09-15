@@ -237,6 +237,9 @@ Most of this site is static and should stay that way.
 - **Add an island** as a `.tsx` component and hydrate it where used with a
   client directive: `client:visible` (most common — hydrate when scrolled into
   view), `client:idle`, or `client:load` (only for above-the-fold interactivity).
+- **Don't add analytics to it.** `Analytics.astro` tracks every island
+  automatically — a view once it's on screen, and the first interaction per
+  page load.
 - **Style it with a co-located CSS Module** (`Thing.module.css`) that consumes
   the same tokens as everything else. **No Tailwind, no inline colours.** Import
   it as `import styles from './Thing.module.css'` and reference

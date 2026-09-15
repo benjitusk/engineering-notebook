@@ -6,6 +6,7 @@ import type { ImageMetadata } from 'astro';
 import FallbackImage from '../assets/blog-placeholder-1.jpg';
 import { SITE_TITLE } from '../consts';
 import { Font } from 'astro:assets';
+import Analytics from './Analytics.astro';
 
 interface Props {
     title: string;
@@ -46,3 +47,6 @@ const { title, description, image = FallbackImage } = Astro.props;
 
 <!-- Twitter -->
 <meta name='twitter:card' content='summary_large_image' />
+
+<!-- Analytics (production only; see Analytics.astro) -->
+<Analytics />
