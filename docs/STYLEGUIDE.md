@@ -67,7 +67,7 @@ There is no global "utilities" soup and no Tailwind.
 | `--accent`          | `#356A8A` | Links, discovery — **never default text**  |
 | `--accent-hover`    | `#28546E` | Accent hover state                         |
 | `--accent-subtle`   | `#E7EFF3` | Pale wash behind accented surfaces         |
-| `--warning`         | `#A66A24` | Failed experiments / warnings **only**     |
+| `--warning`         | `#985D11` | Failed experiments / warnings **only**     |
 | `--warning-subtle`  | `#F5EBDD` | Warning washes                             |
 | `--success`         | `#37704A` | Confirmed / passed / done **only**         |
 | `--success-subtle`  | `#EDF4EE` | Success washes                             |

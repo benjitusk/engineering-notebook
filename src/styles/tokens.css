@@ -39,7 +39,7 @@
 
     /* ---- Palette: warning (amber) ------------------------------------- */
     /* Meaning: failed experiments, warnings, unexpected results. ONLY.    */
-    --warning: #a66a24;
+    --warning: #985d11; /* 4.56:1 on --warning-subtle */
     --warning-subtle: #f5ebdd;
 
     /* ---- Palette: success (green) ------------------------------------- */
