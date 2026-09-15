@@ -46,6 +46,12 @@ const hasHead = Boolean(label || title);
         --tint: var(--surface);
         --label: var(--text-subtle);
 
+        /* satteri-callouts' theme stylesheet also targets `.callout`
+           globally; undo what it sets that this component doesn't. */
+        margin-bottom: 0;
+        mix-blend-mode: normal;
+        line-height: var(--leading-relaxed);
+
         border: var(--border-width) solid var(--border);
         border-left: 3px solid var(--bar);
         border-radius: var(--radius-sm);
