@@ -5,6 +5,9 @@ pubDate: 'Sept 07 2026'
 heroImage: '../../assets/blog-placeholder-3.jpg'
 ---
 import Counter from "../../components/Counter.tsx";
+import Profile from '@components/ProfileCard.tsx';
+import grain from '@/assets/textures/grain.webp'
+import iconpattern from '@/assets/textures/iconpattern.png'
 
 I've had the idea of making a personal site for a while.
 
@@ -32,7 +35,30 @@ While looking for different ways to document my projects, I came up with the fol
 
     I don't want the styles, components, or themes to be constrained by whatever platform I choose. For example, if I were to post on Medium.com, I wouldn't be able to embed this inline, I'd need to host it externally.
 
-    
+<div class="static h-7/12 w-full justify-center items-center">
+
+    <Profile client:load
+      name="Javi A. Torres"
+      title="Software Engineer"
+      handle="javicodes"
+      status="Online"
+      contactText="Contact Me"
+      avatarUrl="https://static.wixstatic.com/media/0810e3_e1c19dfa737a4cea8bf67722af6a2ff3~mv2.jpg/v1/crop/x_1482,y_692,w_3175,h_3178/fill/w_688,h_688,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_2930_edited.jpg"
+      showUserInfo={false}
+      enableTilt={true}
+      enableMobileTilt
+      onContactClick={() => console.log('Contact clicked')}
+      behindGlowColor="rgba(125, 190, 255, 0.67)"
+      iconUrl={iconpattern}
+      behindGlowEnabled
+      innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
+
+
+    />
+
+</div>
+
+
 
 
 I've been thinking about the various ways people document their projects online. Some people write their own blog post on X, others share on Medium.com or dev.to, and yet others still have a personal site with a blog. None of those felt quite what I was looking for. I wanted

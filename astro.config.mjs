@@ -3,6 +3,7 @@
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
+import tailwindcss from "@tailwindcss/vite";
 
 import react from '@astrojs/react';
 
@@ -10,6 +11,10 @@ import react from '@astrojs/react';
 export default defineConfig({
     site: 'https://example.com',
     integrations: [mdx(), sitemap(), react()],
+
+    vite: {
+        plugins: [tailwindcss()]
+    },
 
     // Code fences are highlighted with Shiki; a light theme reads as an
     // intentional capture on the paper background (Prose owns the surface).
