@@ -234,9 +234,14 @@ styling.
 
 ---
 
-## Dark mode (not shipped)
+## Dark mode
 
-The tokens are all semantic, so a dark theme is a single block in
-`tokens.css` — there's a commented-out scaffold there already. Nothing else in
-the codebase would need to change. It's intentionally left off for now because
-the design is a warm-paper light aesthetic.
+Dark mode follows the reader's OS preference. It is a single block at the
+bottom of `tokens.css` that reassigns the palette tokens — nothing else in the
+codebase changes. Put `data-theme="light"` on `<html>` to keep a page on the
+light paper.
+
+As long as you follow the golden rule, new work is dark-mode compatible for
+free. The dark condition is repeated in exactly two other places — the `dark`
+variant in `global.css` and the Shiki colour swap in `Prose.astro` — keep them
+in step if it ever changes.

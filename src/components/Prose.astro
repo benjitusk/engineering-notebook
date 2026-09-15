@@ -108,6 +108,14 @@ const { class: className } = Astro.props;
     .prose :global(pre.astro-code) {
         background-color: var(--code-background) !important;
     }
+    /* Dark theme: Shiki inlines light token colours and exposes the dark
+       ones as --shiki-dark. Same condition as the dark block in tokens.css. */
+    @media (prefers-color-scheme: dark) {
+        :global(:root:not([data-theme='light'])) .prose :global(pre.astro-code),
+        :global(:root:not([data-theme='light'])) .prose :global(pre.astro-code span) {
+            color: var(--shiki-dark) !important;
+        }
+    }
     .prose :global(pre) :global(code) {
         font-family: var(--font-mono);
     }

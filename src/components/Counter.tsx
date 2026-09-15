@@ -8,13 +8,13 @@ export default function Counter() {
             <p className="text-2xl font-bold">{count}</p>
             <div className="flex gap-4">
                 <button
-                    className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                    className="rounded bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
                     onClick={() => setCount(count + 1)}
                 >
                     Increment
                 </button>
                 <button
-                    className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                    className="rounded border border-border bg-secondary px-4 py-2 text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                     onClick={() => setCount(count - 1)}
                 >
                     Decrement

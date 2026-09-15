@@ -16,11 +16,11 @@ export default defineConfig({
         plugins: [tailwindcss()]
     },
 
-    // Code fences are highlighted with Shiki; a light theme reads as an
-    // intentional capture on the paper background (Prose owns the surface).
+    // Code fences are highlighted with Shiki in both palettes. Prose owns the
+    // surface and swaps to the dark token colours under the dark theme.
     markdown: {
         shikiConfig: {
-            theme: 'github-light',
+            themes: { light: 'github-light', dark: 'github-dark' },
             wrap: false,
         },
     },

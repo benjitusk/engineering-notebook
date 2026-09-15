@@ -7,9 +7,15 @@
  *
  * The palette is deliberately small (brief §13): warm paper, charcoal ink,
  * one blueprint-blue accent, and one amber reserved for failed experiments.
+ *
+ * Every colour is defined twice — once here, once in the dark block at the
+ * bottom of this file. Everything else (including the shadcn/ui aliases and
+ * global.css's Tailwind mapping) only references these tokens.
  */
 
 :root {
+    color-scheme: light;
+
     /* ---- Palette: paper ------------------------------------------------ */
     --background: #f7f7f5; /* the page / paper                              */
     --surface: #ffffff; /* raised cards, panels, highlighted areas          */
@@ -119,30 +125,69 @@
 
     /* ---- Stacking ----------------------------------------------------- */
     --z-header: 50;
+
+    /* ---- UI-library aliases (shadcn/ui) ------------------------------- */
+    /* shadcn components expect these names. They are aliases ONLY — each
+       points at a palette token above, so they follow the dark theme for
+       free. Never give one a raw value.
+       Where a shadcn name collides with a brand token (--background,
+       --border, --accent, --radius) the brand token keeps its meaning;
+       global.css's @theme block maps shadcn's meaning onto Tailwind. */
+    --foreground: var(--text);
+    --card: var(--surface);
+    --card-foreground: var(--text);
+    --popover: var(--surface);
+    --popover-foreground: var(--text);
+    --primary: var(--text); /* charcoal ink — blue stays an accent        */
+    --primary-foreground: var(--background);
+    --secondary: var(--code-background);
+    --secondary-foreground: var(--text);
+    --muted: var(--code-background);
+    --muted-foreground: var(--text-muted);
+    --destructive: var(--warning); /* the palette's only alarm colour      */
+    --input: var(--border-strong);
+    --ring: var(--accent); /* matches the base.css focus ring              */
+    --chart-1: var(--accent);
+    --chart-2: var(--warning);
+    --chart-3: var(--text-muted);
+    --chart-4: var(--accent-hover);
+    --chart-5: var(--text-subtle);
+    --sidebar: var(--surface);
+    --sidebar-foreground: var(--text);
+    --sidebar-primary: var(--text);
+    --sidebar-primary-foreground: var(--background);
+    --sidebar-accent: var(--accent-subtle);
+    --sidebar-accent-foreground: var(--text);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--accent);
 }
 
 /*
- * Dark theme — intentionally not shipped yet (brief is a warm-paper light
- * design). The tokens above are all semantic, so a dark theme drops in here
- * with no changes anywhere else. Uncomment + tune when wanted.
+ * Dark theme — follows the reader's OS preference. Put data-theme="light" on
+ * <html> to keep a page on the light paper. Only palette tokens are
+ * reassigned; everything else (aliases included) derives from them.
  *
- * @media (prefers-color-scheme: dark) {
- *     :root:not([data-theme='light']) {
- *         --background: #16181a;
- *         --surface: #1e2124;
- *         --text: #f2f3f2;
- *         --text-muted: #a8adb0;
- *         --text-subtle: #7c8184;
- *         --border: #2c2f31;
- *         --border-strong: #3a3e40;
- *         --accent: #6fa3c2;
- *         --accent-hover: #8fbcd6;
- *         --accent-subtle: #1d2a33;
- *         --warning: #d29a5b;
- *         --warning-subtle: #2c2519;
- *         --code-background: #232629;
- *         --grid-line: rgba(111, 163, 194, 0.05);
- *         --grid-line-faint: rgba(111, 163, 194, 0.025);
- *     }
- * }
+ * If this condition ever changes, keep the `dark` variant in global.css and
+ * the Shiki swap in Prose.astro in step with it.
  */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        color-scheme: dark;
+
+        --background: #16181a;
+        --surface: #1e2124;
+        --text: #f2f3f2;
+        --text-muted: #a8adb0;
+        --text-subtle: #7c8184;
+        --border: #2c2f31;
+        --border-strong: #3a3e40;
+        --accent: #6fa3c2;
+        --accent-hover: #8fbcd6;
+        --accent-subtle: #1d2a33;
+        --warning: #d29a5b;
+        --warning-subtle: #2c2519;
+        --code-background: #232629;
+        --grid-line: rgba(111, 163, 194, 0.05);
+        --grid-line-faint: rgba(111, 163, 194, 0.025);
+    }
+}
