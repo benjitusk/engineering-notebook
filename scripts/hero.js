@@ -7,6 +7,7 @@
 //   npm run hero -- notebook-init --seed 7        reroll
 //   npm run hero -- notebook-init --all-motifs    every motif, side by side
 //   npm run hero -- --png                         also write PNGs (light theme)
+//   npm run hero -- notebook-init --og            also write the post's share card (<name>.og.png)
 //   npm run hero -- --out some/dir                output directory
 //
 // Output: one SVG per figure plus index.html, a contact sheet showing each
@@ -25,6 +26,7 @@ import yaml from 'js-yaml';
 import sharp from 'sharp';
 import { MOTIFS, renderHero } from '../src/lib/hero/index.js';
 import { DARK, LIGHT, TOKENS } from '../src/lib/hero/palette.js';
+import { renderPostCard } from '../src/lib/og/post-card.js';
 
 const CONTENT_DIR = 'src/content/projects';
 const FONT_DIR = 'src/assets/og';
@@ -42,6 +44,7 @@ const { values: args, positionals: slugs } = parseArgs({
         seed: { type: 'string' },
         'all-motifs': { type: 'boolean', default: false },
         png: { type: 'boolean', default: false },
+        og: { type: 'boolean', default: false },
         out: { type: 'string', default: '.hero-preview' },
         help: { type: 'boolean', short: 'h', default: false },
     },
@@ -96,6 +99,12 @@ for (const post of posts) {
         await fs.writeFile(path.join(outDir, `${name}.svg`), svg);
         if (args.png) {
             await sharp(Buffer.from(svg), { density: 192 }).png().toFile(path.join(outDir, `${name}.png`));
+        }
+        if (args.og) {
+            // Same renderer as /og/projects/<slug>.png; a heroImage wins over the figure.
+            const heroImagePath = post.heroImage ? path.resolve(CONTENT_DIR, String(post.heroImage)) : undefined;
+            const card = await renderPostCard({ title: post.title, heroSvg: heroImagePath ? undefined : svg, heroImagePath });
+            await fs.writeFile(path.join(outDir, `${name}.og.png`), card);
         }
         figures.push({ post, name, motif, source, seed, options });
         console.log(`${name.padEnd(40)} ${motif.padEnd(8)} seed ${String(seed).padEnd(28)} (${source})`);

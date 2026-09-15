@@ -1,14 +1,13 @@
-import { getCollection } from 'astro:content';
 import { OGImageRoute } from 'astro-og-canvas';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
 /**
  * Open Graph cards: one 1200×630 PNG per page, rendered at build time.
  *
- * Keys mirror page paths — `/` → `/og/index.png`, `/about/` → `/og/about.png`,
- * `/projects/fingerprint-reader/` → `/og/projects/fingerprint-reader.png`.
- * BaseHead derives the same key from the page URL, so a new page only needs an
- * entry here (project posts are picked up from the collection automatically).
+ * Text cards for pages without a hero. Keys mirror page paths — `/` →
+ * `/og/index.png`, `/about/` → `/og/about.png` — and BaseHead derives the same
+ * key from the page URL, so a new page only needs an entry here. Project posts
+ * get hero cards from ./projects/[slug].png.ts instead.
  */
 type Card = { title: string; description: string };
 
@@ -19,20 +18,12 @@ const staticPages: Record<string, Card> = {
     '404': { title: 'Page not found', description: SITE_DESCRIPTION },
 };
 
-const projects = await getCollection('projects');
-const projectPages = Object.fromEntries(
-    projects.map((entry): [string, Card] => [
-        `projects/${entry.id}`,
-        { title: entry.data.title, description: entry.data.description },
-    ])
-);
-
 // Palette from src/styles/tokens.css (light theme): --text, --text-muted.
 const INK: [number, number, number] = [24, 26, 27];
 const MUTED: [number, number, number] = [104, 109, 112];
 
 export const { getStaticPaths, GET } = await OGImageRoute({
-    pages: { ...staticPages, ...projectPages },
+    pages: staticPages,
     getImageOptions: (_path, page: Card) => ({
         title: page.title,
         description: page.description,

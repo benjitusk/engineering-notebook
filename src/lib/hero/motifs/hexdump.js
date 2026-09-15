@@ -64,7 +64,7 @@ export default function hexdump({ rand, area: a, post }) {
             back.push(rect(hexX + sigCol * 3 * cw - 5, y - 20, (signature.length * 3 - 1) * cw + 10, 28, 'hl-fill', 3));
             back.push(rect(asciiX + sigCol * cw - 4, y - 20, signature.length * cw + 8, 28, 'hl-fill', 3));
             const noteX = asciiX + cols * cw + 24;
-            out.push(path(`M${r(asciiX + to * cw + 6)} ${r(y - 6)} H${r(noteX - 6)}`, 'leader'));
+            out.push(path(`M${r(asciiX + cols * cw + 6)} ${r(y - 6)} H${r(noteX - 6)}`, 'leader'));
             out.push(text(noteX, y, 'MAGIC?', 'hl-text'));
         }
     }

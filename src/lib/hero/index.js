@@ -113,7 +113,10 @@ function titleWords(title) {
 function styles(id, p, failed) {
     const hl = failed ? p.warning : p.accent;
     const wash = failed ? p.warningWash : p.accentWash;
-    const m = p.mono;
+    // Longhand font properties (no `font:` shorthand) so resvg, which renders
+    // these figures for share cards, reads them the same way browsers do.
+    const font = (/** @type {number} */ weight, /** @type {number} */ size) =>
+        `font-family:${p.mono};font-weight:${weight};font-size:${size}px`;
     /** @type {Record<string, string>} */
     const rules = {
         bg: `fill:${p.paper}`,
@@ -121,21 +124,21 @@ function styles(id, p, failed) {
         'grid-major': `fill:none;stroke:${p.accent};stroke-opacity:.12;stroke-width:1`,
         frame: `fill:none;stroke:${p.ruleStrong};stroke-width:1.5`,
         tick: `stroke:${p.ruleStrong};stroke-width:1.5`,
-        zone: `fill:${p.subtle};font:500 11px ${m}`,
+        zone: `fill:${p.subtle};${font(500, 11)}`,
         block: `fill:${p.surface};stroke:${p.ruleStrong};stroke-width:1.5`,
-        'block-key': `fill:${p.subtle};font:500 10px ${m};letter-spacing:.1em`,
-        'block-value': `fill:${p.muted};font:500 13px ${m}`,
+        'block-key': `fill:${p.subtle};${font(500, 10)};letter-spacing:.1em`,
+        'block-value': `fill:${p.muted};${font(500, 13)}`,
         rule: `fill:none;stroke:${p.rule};stroke-width:1`,
         'rule-dash': `fill:none;stroke:${p.ruleStrong};stroke-width:1.5;stroke-dasharray:4 5`,
         wire: `fill:none;stroke:${p.subtle};stroke-width:2;stroke-linejoin:round;stroke-linecap:round`,
         'wire-ink': `fill:none;stroke:${p.muted};stroke-width:2;stroke-linejoin:round;stroke-linecap:round`,
         hl: `fill:none;stroke:${hl};stroke-width:3;stroke-linejoin:round;stroke-linecap:round`,
         'hl-fill': `fill:${wash}`,
-        'hl-text': `fill:${hl};font:600 16px ${m}`,
+        'hl-text': `fill:${hl};${font(600, 16)}`,
         leader: `fill:none;stroke:${hl};stroke-width:1.5;stroke-dasharray:5 4`,
-        label: `fill:${p.subtle};font:600 14px ${m};letter-spacing:.12em`,
-        mono: `fill:${p.muted};font:400 16px ${m}`,
-        'mono-sm': `fill:${p.subtle};font:400 12px ${m}`,
+        label: `fill:${p.subtle};${font(600, 14)};letter-spacing:.12em`,
+        mono: `fill:${p.muted};${font(400, 16)}`,
+        'mono-sm': `fill:${p.subtle};${font(400, 12)}`,
         node: `fill:${p.surface};stroke:${p.ruleStrong};stroke-width:1.5`,
         'node-hl': `fill:${p.surface};stroke:${hl};stroke-width:2.5`,
         dot: `fill:${p.subtle}`,
