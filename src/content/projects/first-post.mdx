@@ -3,15 +3,17 @@ title: "I built a place to write about things I don't know how to build"
 description: 'Why I built this engineering notebook, what I want to document here, and why the interesting part of a project is usually the parts that go wrong.'
 pubDate: 'Sept 07 2026'
 heroImage: '../../assets/blog-placeholder-3.jpg'
+number: 'init'
 ---
-import Counter from "../../components/Counter.tsx";
+
+import Counter from '@/components/Counter.tsx';
 import Profile from '@components/ProfileCard.tsx';
-import grain from '@/assets/textures/grain.webp'
-import iconpattern from '@/assets/textures/iconpattern.png'
+import grain from '@/assets/textures/grain.webp';
+import iconpattern from '@/assets/textures/iconpattern.png';
 
 I've had the idea of making a personal site for a while.
 
-Not particularly because I needed a portfolio. I already have a [CV](https://benjitusk.com/cv), a GitHub profile, and the usual collection of links that tend to make up a developer's online presence.
+Not particularly because I needed a portfolio. I already have a CV, a GitHub profile, and the usual collection of links that tend to make up a developer's online presence.
 
 What I wanted was a place to write about the things I actually spend my time doing. From things that I want to try out, to the projects that start with "I wish I could just do it myself" and end with experience and questionable results.
 
@@ -19,57 +21,125 @@ So, here we are.
 
 ## Why an Engineering Notebook?
 
+I've been thinking about the various ways people document their projects online. Some people write their own blog post on X, others share on Medium.com or dev.to, and yet others still have a personal site with a blog. None of those felt quite what I was looking for. I wanted a place where I can work with tools that are familiar to me, and to not be limited by platform restrictions.
+
 While looking for different ways to document my projects, I came up with the following list of requirements that needed to be met:
-- [ ] It needs to be easy to write
+
+- [x] It needs to be easy to write
 
     The <abbr title="Writers Experience">WX</abbr> needs to be excellent. I don't want to be fiddling with CSS and colors etc, during the time I dedicate to writing.
-- [ ] Writable with Markdown.
+
+- [x] Writable with Markdown.
 
     For obvious reasons, such as:
     1. Markdown is awesome
     2. No further reasons needed
-- [ ] Customizable with [MDX](https://mdxjs.com)
+
+- [x] Customizable with [MDX](https://mdxjs.com)
 
     I love React, and the idea of being able to embed components into a Markdown document is quite appealing.
-- [ ] 100% Mine and Customizable
+
+- [x] 100% Mine and Customizable
 
     I don't want the styles, components, or themes to be constrained by whatever platform I choose. For example, if I were to post on Medium.com, I wouldn't be able to embed this inline, I'd need to host it externally.
 
-<div class="static h-7/12 w-full justify-center items-center">
+    With MDX, I can drop an interactive component directly into the content:
 
-    <Profile client:load
-      name="Javi A. Torres"
-      title="Software Engineer"
-      handle="javicodes"
-      status="Online"
-      contactText="Contact Me"
-      avatarUrl="https://static.wixstatic.com/media/0810e3_e1c19dfa737a4cea8bf67722af6a2ff3~mv2.jpg/v1/crop/x_1482,y_692,w_3175,h_3178/fill/w_688,h_688,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_2930_edited.jpg"
-      showUserInfo={false}
-      enableTilt={true}
-      enableMobileTilt
-      onContactClick={() => console.log('Contact clicked')}
-      behindGlowColor="rgba(125, 190, 255, 0.67)"
-      iconUrl={iconpattern}
-      behindGlowEnabled
-      innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
+    <Counter client:visible />
 
+    All the while, all I need to write is:
 
-    />
+    ```markdown
+    - [x] 100% Mine and Customizable
 
-</div>
+        I don't want the styles, components, or themes to be constrained by whatever platform I choose.
+        For example, if I were to post on Medium.com, I wouldn't be able to embed this inline, I'd need
+        to host it externally.
 
+        With MDX, I can drop an interactive component directly into the content:
+        <Counter client:visible />
+    ```
 
+## The Implementation
 
+To meet these requirements, the infrastructure is relatively straightforward:
 
-I've been thinking about the various ways people document their projects online. Some people write their own blog post on X, others share on Medium.com or dev.to, and yet others still have a personal site with a blog. None of those felt quite what I was looking for. I wanted
+- **Framework:** Astro for the static site generation and native MDX support.
+- **Componentns:** React for interactive elements.
+- **Deployment:** Firebase Hosting
 
+Setting this up was not without the usual headaches that come with learning how to use new tools. I spent a frustrating
+few minutes trying to figure out why my MDX was getting rendered as raw markdown, before realizing that I had saved this
+file as `first-post.md`, instead of `first-post.mdx` :man_facepalming:.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Once I fixed the file extension, the components still failed to load because I was importing from `@/components` instead
+of the alias `@components` I configured in the `tsconfig.json`.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+These are trivial mistakes, but they are exactly the kinds of friction that consume actual development time, and are part
+and parcel of the learning curve when adjusting to a new toolset.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+Even as I was writing the above paragraph, I wanted to include the `:man_facepalming:` emoji, but to to my surprise, emoji
+shortcodes were not bundled by default in Astro. I went to check which MDX plugin I needed, and found `remark-gemoji`.
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+After installing it and configuring it in `astro.config.mjs`, I was presented with the following error message:
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+> [!console]- Astro Error
+>
+> ```ansi
+> [31m14:22:33[39m [31m[ERROR][39m [31m[config][39m `markdown.remarkPlugins`, `markdown.rehypePlugins`, and `markdown.remarkRehype` run
+> on the `unified` processor from `@astrojs/markdown-remark`, which is no longer installed by default now that
+> Satteri is the default Markdown processor. Install it with:
+> npm install @astrojs/markdown-remark
+> [1mStack trace:[22m
+>   [90mat /Users/benjitusk/GitHub/astro-blog/node_modules/astro/dist/core/config/validate.js:56:3[39m
+>   [90m[...] See full stack trace in the browser, or rerun with --verbose.[39m
+> ```
+
+A bit of research revealed that Astro migrated away from the JS based [`unified`](https://unifiedjs.com/) markdown pipeline
+in v7.0 to the Rust based [`Sätteri`](https://satteri.bruits.org/) pipeline. Becuase of this, many plugins had to be ported over,
+and I found the `satteri-emoji` plugin to be a satisfactory replacement.
+
+Some of the other customization I needed to do while writing this article was:
+
+- Set up a callouts plugin, and add a custom callout for console outputs, along with custom styling for all the other
+  callout types:
+
+    > [!example]- Sample console output
+    >
+    > > [!console] A very real console
+    > >
+    > > ```console
+    > > Hello world!
+    > > ```
+
+- Overriding the default Astro font provider and configuring my own.
+- Setting up integration with Shadcn components, so I can just pull from their registry instead of having to build my own
+  components from scratch.
+
+## Documenting Failure and the Unknown
+
+Standard technical blogs usually present a sanitized version of development, following a very dry development arc:
+
+1. A problem is presented
+2. A clean solution is proposed
+3. The implementation is executed flawlessly
+
+As anyone who develops software knows, this is rarely how software development actually works. The most insightful technical
+information often comes from the failures, dead ends, and integration hell.
+
+This site is not intended to showcase my completed projects, it's an engineering notebook. I'll be writing things while
+I'm still trying to figure them out, instead of wating to publish the sterilized implementation when its complete.
+Failure and uncertainty are the very things I want to highlight as I document each project.
+
+## What belongs here:
+
+- **Incomplete Prototypes:** Ideas that are functional but not production-ready.
+- **Debugging Sessions:** Step-by-step logs of tracking down obscure bugs, specifically when the root cause contradicts initial hypotheses.
+- **Reverse-Engineering Logs:** Attempts to understand how an undocumented API or system operates, regardless of whether the attempt succeeds.
+- **Whatever the heck else I want to write about:** I mean, it's my notebook, after all. I can doodle if I want to :wink:.
+
+## Conclusion
+
+The infrastructure for the site is configured, the MDX pipeline works, and the CI/CD is functioning. Well, not yet,
+but presumably if you're reading this then I figured it out by now. The initial setup is out of the way, which means
+I can start writing about actual projects.
