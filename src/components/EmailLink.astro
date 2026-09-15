@@ -11,6 +11,10 @@ interface Props {
 
 const { email = AUTHOR_EMAIL, label, class: className } = Astro.props;
 
+if (!email) {
+    throw new Error('AUTHOR_EMAIL is not set. Add it to .env (see .env.example).');
+}
+
 // Base64 the address so the raw string never ships in the HTML source.
 // Bots scanning for `foo@bar.com` or `mailto:` find nothing to scrape.
 const encoded = Buffer.from(email).toString('base64');
