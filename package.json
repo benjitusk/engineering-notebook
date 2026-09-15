@@ -24,6 +24,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "astro": "^7.3.1",
+    "astro-og-canvas": "^0.13.2",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.6",
     "ogl": "^1.0.11",
@@ -41,6 +42,7 @@
     "esbuild": true
   },
   "devDependencies": {
+    "astro-og": "^0.3.2",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1"
   }

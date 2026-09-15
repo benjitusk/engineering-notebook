@@ -10,7 +10,12 @@ type Props = CollectionEntry<'projects'>['data'];
 const { title, description, pubDate, updatedDate, heroImage, number, tags, meta } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} width='prose'>
+<BaseLayout
+    title={title}
+    description={description}
+    article={{ publishedTime: pubDate, modifiedTime: updatedDate, tags }}
+    width='prose'
+>
     <article>
         <ProjectHeader
             title={title}

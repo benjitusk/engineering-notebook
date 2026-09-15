@@ -1,5 +1,5 @@
 ---
-import type { ImageMetadata } from 'astro';
+import type { ComponentProps } from 'astro/types';
 import BaseHead from './BaseHead.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
@@ -13,17 +13,18 @@ import Footer from './Footer.astro';
 interface Props {
     title: string;
     description: string;
-    image?: ImageMetadata;
+    /** Article metadata for Open Graph; set by the BlogPost layout. */
+    article?: ComponentProps<typeof BaseHead>['article'];
     width?: 'prose' | 'page' | 'wide';
 }
 
-const { title, description, image, width = 'page' } = Astro.props;
+const { title, description, article, width = 'page' } = Astro.props;
 ---
 
 <!doctype html>
 <html lang='en'>
     <head>
-        <BaseHead title={title} description={description} image={image} />
+        <BaseHead title={title} description={description} article={article} />
     </head>
     <body>
         <Header />

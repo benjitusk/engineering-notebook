@@ -8,11 +8,13 @@ import tailwindcss from '@tailwindcss/vite';
 import satteriCallouts from 'satteri-callouts';
 import { satteriEmoji } from 'satteri-emoji';
 import react from '@astrojs/react';
+import og from 'astro-og';
 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://notebook.benjitusk.com',
-    integrations: [mdx(), sitemap(), react()],
+    // astro-og: dev toolbar app that previews each page's social share card.
+    integrations: [mdx(), sitemap(), react(), og()],
 
     vite: {
         plugins: [tailwindcss()],
