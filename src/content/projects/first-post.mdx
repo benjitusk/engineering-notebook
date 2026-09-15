@@ -1,35 +1,32 @@
 ---
 title: "I built a place to write about things I don't know how to build"
-description: 'Why I built this engineering notebook, what I want to document here, and why the interesting part of a project is usually the parts that go wrong.'
+description: 'Why I built this engineering notebook, what I want to document here, and why the interesting parts of a project are the ones that go wrong.'
 pubDate: 'Sept 07 2026'
 heroImage: '../../assets/blog-placeholder-3.jpg'
 number: 'init'
 ---
 
 import Counter from '@/components/Counter.tsx';
-import Profile from '@components/ProfileCard.tsx';
-import grain from '@/assets/textures/grain.webp';
-import iconpattern from '@/assets/textures/iconpattern.png';
 
 I've had the idea of making a personal site for a while.
 
 Not particularly because I needed a portfolio. I already have a CV, a GitHub profile, and the usual collection of links that tend to make up a developer's online presence.
 
-What I wanted was a place to write about the things I actually spend my time doing. From things that I want to try out, to the projects that start with "I wish I could just do it myself" and end with experience and questionable results.
+What I wanted was a place to write about the things I actually spend my time doing, from things I want to try out to the projects that start with "I wish I could just do it myself" and end with experience and questionable results.
 
 So, here we are.
 
 ## Why an Engineering Notebook?
 
-I've been thinking about the various ways people document their projects online. Some people write their own blog post on X, others share on Medium.com or dev.to, and yet others still have a personal site with a blog. None of those felt quite what I was looking for. I wanted a place where I can work with tools that are familiar to me, and to not be limited by platform restrictions.
+I've been thinking about the various ways people document their projects online. Some people write their own blog post on X, others share on Medium.com or dev.to, and others still have a personal site with a blog. None of those felt quite like what I was looking for. I wanted a place where I can work with tools that are familiar to me, without being limited by platform restrictions.
 
-While looking for different ways to document my projects, I came up with the following list of requirements that needed to be met:
+While looking for different ways to document my projects, I came up with the following list of requirements:
 
 - [x] It needs to be easy to write
 
-    The <abbr title="Writers Experience">WX</abbr> needs to be excellent. I don't want to be fiddling with CSS and colors etc, during the time I dedicate to writing.
+    The <abbr title="Writer's Experience">WX</abbr> needs to be excellent. I don't want to be fiddling with CSS and colors etc. during the time I dedicate to writing.
 
-- [x] Writable with Markdown.
+- [x] Writable with Markdown
 
     For obvious reasons, such as:
     1. Markdown is awesome
@@ -41,20 +38,20 @@ While looking for different ways to document my projects, I came up with the fol
 
 - [x] 100% Mine and Customizable
 
-    I don't want the styles, components, or themes to be constrained by whatever platform I choose. For example, if I were to post on Medium.com, I wouldn't be able to embed this inline, I'd need to host it externally.
+    I don't want the styles, components, or themes to be constrained by whatever platform I choose. For example, if I were to post on Medium.com, I wouldn't be able to embed a live component inline; I'd need to host it externally.
 
     With MDX, I can drop an interactive component directly into the content:
 
     <Counter client:visible />
 
-    All the while, all I need to write is:
+    All I need to write for that is:
 
     ```markdown
     - [x] 100% Mine and Customizable
 
         I don't want the styles, components, or themes to be constrained by whatever platform I choose.
-        For example, if I were to post on Medium.com, I wouldn't be able to embed this inline, I'd need
-        to host it externally.
+        For example, if I were to post on Medium.com, I wouldn't be able to embed a live component inline;
+        I'd need to host it externally.
 
         With MDX, I can drop an interactive component directly into the content:
         <Counter client:visible />
@@ -65,23 +62,23 @@ While looking for different ways to document my projects, I came up with the fol
 To meet these requirements, the infrastructure is relatively straightforward:
 
 - **Framework:** Astro for the static site generation and native MDX support.
-- **Componentns:** React for interactive elements.
-- **Deployment:** Firebase Hosting
+- **Components:** React for interactive elements.
+- **Deployment:** Firebase Hosting.
 
 Setting this up was not without the usual headaches that come with learning how to use new tools. I spent a frustrating
-few minutes trying to figure out why my MDX was getting rendered as raw markdown, before realizing that I had saved this
-file as `first-post.md`, instead of `first-post.mdx` :man_facepalming:.
+few minutes trying to figure out why my MDX was getting rendered as raw Markdown before realizing that I had saved this
+file as `first-post.md` instead of `first-post.mdx` :man_facepalming:.
 
 Once I fixed the file extension, the components still failed to load because I was importing from `@/components` instead
-of the alias `@components` I configured in the `tsconfig.json`.
+of `@components`, the alias I configured for `src/components/ui` in `tsconfig.json`.
 
 These are trivial mistakes, but they are exactly the kinds of friction that consume actual development time, and are part
 and parcel of the learning curve when adjusting to a new toolset.
 
-Even as I was writing the above paragraph, I wanted to include the `:man_facepalming:` emoji, but to to my surprise, emoji
-shortcodes were not bundled by default in Astro. I went to check which MDX plugin I needed, and found `remark-gemoji`.
+Even as I was writing the above paragraph, I wanted to include the `:man_facepalming:` emoji, but to my surprise, emoji
+shortcodes were not bundled by default in Astro. I went to check which Markdown plugin I needed, and found `remark-gemoji`.
 
-After installing it and configuring it in `astro.config.mjs`, I was presented with the following error message:
+After installing and configuring it in `astro.config.mjs`, I was presented with the following error message:
 
 > [!console]- Astro Error
 >
@@ -95,13 +92,13 @@ After installing it and configuring it in `astro.config.mjs`, I was presented wi
 >   [90m[...] See full stack trace in the browser, or rerun with --verbose.[39m
 > ```
 
-A bit of research revealed that Astro migrated away from the JS based [`unified`](https://unifiedjs.com/) markdown pipeline
-in v7.0 to the Rust based [`Sätteri`](https://satteri.bruits.org/) pipeline. Becuase of this, many plugins had to be ported over,
+A bit of research revealed that in v7.0, Astro migrated from the JS-based [`unified`](https://unifiedjs.com/) Markdown pipeline
+to the Rust-based [`Sätteri`](https://satteri.bruits.org/) pipeline. Because of this, many plugins had to be ported over,
 and I found the `satteri-emoji` plugin to be a satisfactory replacement.
 
-Some of the other customization I needed to do while writing this article was:
+Some of the other customizations I needed to make while writing this article were:
 
-- Set up a callouts plugin, and add a custom callout for console outputs, along with custom styling for all the other
+- Setting up a callouts plugin and adding a custom callout for console output, along with custom styling for all the other
   callout types:
 
     > [!example]- Sample console output
@@ -113,25 +110,25 @@ Some of the other customization I needed to do while writing this article was:
     > > ```
 
 - Overriding the default Astro font provider and configuring my own.
-- Setting up integration with Shadcn components, so I can just pull from their registry instead of having to build my own
+- Setting up integration with shadcn components, so I can just pull from their registry instead of having to build my own
   components from scratch.
 
 ## Documenting Failure and the Unknown
 
-Standard technical blogs usually present a sanitized version of development, following a very dry development arc:
+Standard technical blogs usually present a sanitized version of development, following a very dry arc:
 
 1. A problem is presented
 2. A clean solution is proposed
 3. The implementation is executed flawlessly
 
-As anyone who develops software knows, this is rarely how software development actually works. The most insightful technical
+As anyone who develops software knows, this is rarely how it actually goes. The most insightful technical
 information often comes from the failures, dead ends, and integration hell.
 
-This site is not intended to showcase my completed projects, it's an engineering notebook. I'll be writing things while
-I'm still trying to figure them out, instead of wating to publish the sterilized implementation when its complete.
+This site is not intended to showcase my completed projects; it's an engineering notebook. I'll be writing about things while
+I'm still trying to figure them out, instead of waiting to publish the sterilized implementation when it's complete.
 Failure and uncertainty are the very things I want to highlight as I document each project.
 
-## What belongs here:
+## What belongs here
 
 - **Incomplete Prototypes:** Ideas that are functional but not production-ready.
 - **Debugging Sessions:** Step-by-step logs of tracking down obscure bugs, specifically when the root cause contradicts initial hypotheses.
@@ -141,5 +138,5 @@ Failure and uncertainty are the very things I want to highlight as I document ea
 ## Conclusion
 
 The infrastructure for the site is configured, the MDX pipeline works, and the CI/CD is functioning. Well, not yet,
-but presumably if you're reading this then I figured it out by now. The initial setup is out of the way, which means
+but presumably if you're reading this, then I've figured it out by now. The initial setup is out of the way, which means
 I can start writing about actual projects.
