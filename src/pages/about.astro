@@ -11,32 +11,31 @@ import { GITHUB_URL } from '../consts';
     <Hero title='About'>
         <Eyebrow slot='eyebrow' tone='accent'>Who's writing this</Eyebrow>
         <Fragment slot='lede'>
-            I'm Benji — a computer science graduate who likes taking things apart to understand how they work.
+            I'm Benji, a computer science graduate who likes taking things apart to see how they work.
         </Fragment>
     </Hero>
 
     <Prose>
         <p>
-            <!-- Placeholder copy — edit freely. Written in the notebook's voice: honest, curious, understated. -->
-            Most of what I build starts as a question I can't answer yet. How does this device actually talk to its driver?
-            What is this protocol really doing on the wire? Could I make this run on Linux? I tend to follow those questions
-            further than is strictly reasonable, and this notebook is where the results end up.
+            This is my engineering notebook. I write about projects while I'm still working on them: what I tried, what
+            broke, and what I figured out along the way. I explain why in <a href='/projects/first-post/'>my first post</a>.
         </p>
         <p>
-            I care more about the process than the polish. A wrong assumption I chased for three days is often more
-            useful to write down than the tidy solution I landed on afterwards — so you'll find both here: the things
-            that worked, and the ones that very much didn't.
+            Most of my projects start with a question I can't answer yet, like how a device talks to its driver, or
+            whether I can get something running on Linux. I usually follow those questions further than I probably
+            should, and this is where the results end up, including the wrong assumptions and dead ends. Those are
+            often more useful to write down than the solution I eventually land on.
         </p>
 
         <h2>What I work on</h2>
         <p>
-            Reverse engineering hardware, writing Linux software, poking at I²C and USB, and learning whatever tool the
-            current project demands. The subjects change constantly; the curiosity doesn't.
+            Mostly reverse engineering hardware, writing software for Linux, and poking at buses like I²C and USB. The
+            specifics change from project to project, and I end up learning whatever tools the current one needs.
         </p>
 
         <h2>Get in touch</h2>
         <p>
-            The code lives on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can
+            My code is on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can
             reach me at <EmailLink />.
         </p>
     </Prose>
