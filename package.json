@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "hero": "node scripts/hero.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "astro-og": "^0.3.2",
+    "js-yaml": "^4.3.2",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1"
   }

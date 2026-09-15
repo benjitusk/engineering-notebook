@@ -3,11 +3,12 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../components/BaseLayout.astro';
 import ProjectHeader from '../components/ProjectHeader.astro';
 import Figure from '../components/Figure.astro';
+import PostHero from '../components/PostHero.astro';
 import Prose from '../components/Prose.astro';
 
-type Props = CollectionEntry<'projects'>['data'];
+type Props = CollectionEntry<'projects'>['data'] & { slug: string };
 
-const { title, description, pubDate, updatedDate, heroImage, number, tags, meta } = Astro.props;
+const { slug, title, description, pubDate, updatedDate, heroImage, hero, number, tags, status, meta } = Astro.props;
 ---
 
 <BaseLayout
@@ -26,7 +27,22 @@ const { title, description, pubDate, updatedDate, heroImage, number, tags, meta 
             meta={meta}
         />
 
-        {heroImage && <Figure src={heroImage} alt='' width={1020} height={510} class='post-hero' />}
+        {
+            heroImage ? (
+                <Figure src={heroImage} alt='' width={1020} height={510} class='post-hero' />
+            ) : (
+                <PostHero
+                    slug={slug}
+                    title={title}
+                    number={number}
+                    pubDate={pubDate}
+                    tags={tags}
+                    status={status}
+                    hero={hero}
+                    class='post-hero'
+                />
+            )
+        }
 
         <Prose>
             <slot />
@@ -35,7 +51,9 @@ const { title, description, pubDate, updatedDate, heroImage, number, tags, meta 
 </BaseLayout>
 
 <style>
-    .post-hero {
+    /* The hero is rendered by a child component (Figure or PostHero), so reach
+       it through this layout's own element; a bare scoped class wouldn't match. */
+    article :global(.post-hero) {
         margin-bottom: var(--space-12);
     }
 </style>

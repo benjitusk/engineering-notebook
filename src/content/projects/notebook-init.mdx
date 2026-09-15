@@ -2,8 +2,13 @@
 title: 'I built a place to write about things I’m figuring out how to build'
 description: 'Why I built this engineering notebook, what I want to document here, and why the interesting parts of a project are the ones that go wrong.'
 pubDate: 'Sept 07 2026'
-heroImage: '../../assets/blog-placeholder-3.jpg'
 number: 'init'
+status: Production
+tags: ['Markdown Extended', 'DNS', 'Firebase', 'Web', 'Astro']
+meta:
+    Status: Production
+    Platform: Web
+    Language: MDX
 ---
 
 import Counter from '@/components/Counter.tsx';
@@ -95,6 +100,11 @@ After installing and configuring it in `astro.config.mjs`, I was presented with 
 A bit of research revealed that in v7.0, Astro migrated from the JS-based [`unified`](https://unifiedjs.com/) Markdown pipeline
 to the Rust-based [`Sätteri`](https://satteri.bruits.org/) pipeline. Because of this, many plugins had to be ported over,
 and I found the `satteri-emoji` plugin to be a satisfactory replacement.
+
+I also had some trouble when trying to verify the domain for Firebase Hosting. I found out that if you enable Cloudflare's
+domain proxying service, it doesn't publish the records normally. The actual records are served by cloudflare, and your domain
+just gets an `A` record pointing to Cloudflare's services. After disabling the Cloudflare proxy, the domain verification
+went through within a couple of minutes.
 
 Some of the other customizations I needed to make while writing this article were:
 

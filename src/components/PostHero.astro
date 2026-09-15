@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { renderHero } from '../lib/hero/index.js';
+
+/**
+ * PostHero — the generated figure at the top of a project post (see
+ * src/lib/hero). Deterministic per post; tweak it with `hero` in frontmatter
+ * and preview variations with `npm run hero`.
+ */
+type Data = CollectionEntry<'projects'>['data'];
+
+interface Props {
+    slug: string;
+    title: string;
+    number?: string;
+    pubDate?: Date;
+    tags?: string[];
+    status?: string;
+    hero?: Data['hero'];
+    class?: string;
+}
+
+const { class: className, ...post } = Astro.props;
+const { svg } = renderHero(post);
+---
+
+<figure class:list={['post-hero-figure', className]} set:html={svg} />
+
+<style>
+    .post-hero-figure {
+        margin: 0;
+        overflow: hidden;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--background);
+        line-height: 0;
+    }
+
+    .post-hero-figure :global(svg) {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+</style>

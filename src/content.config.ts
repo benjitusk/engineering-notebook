@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { MOTIFS } from './lib/hero/index.js';
 
 const projects = defineCollection({
     // Load Markdown and MDX files in the `src/content/projects/` directory.
@@ -14,6 +15,15 @@ const projects = defineCollection({
             pubDate: z.coerce.date(),
             updatedDate: z.coerce.date().optional(),
             heroImage: z.optional(image()),
+            /** Generated hero figure, used when there's no heroImage (src/lib/hero).
+             *  All optional: the motif comes from tags and the seed from the slug. */
+            hero: z
+                .object({
+                    motif: z.enum(MOTIFS).optional(),
+                    seed: z.union([z.string(), z.number()]).optional(),
+                    labels: z.array(z.string()).optional(),
+                })
+                .optional(),
 
             // --- Project / notebook metadata (all optional) ---
             // Shown by ProjectHeader / MetaTable / Tags on the post page.

@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# hero figure previews (npm run hero)
+.hero-preview/
