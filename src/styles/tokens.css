@@ -7,6 +7,8 @@
  *
  * The palette is deliberately small (brief §13): warm paper, charcoal ink,
  * one blueprint-blue accent, and one amber reserved for failed experiments.
+ * Three narrower semantic hues — green (success), red (danger) and violet
+ * (example) — exist for callouts; like amber, use them only for that meaning.
  *
  * Every colour is defined twice — once here, once in the dark block at the
  * bottom of this file. Everything else (including the shadcn/ui aliases and
@@ -39,6 +41,21 @@
     /* Meaning: failed experiments, warnings, unexpected results. ONLY.    */
     --warning: #a66a24;
     --warning-subtle: #f5ebdd;
+
+    /* ---- Palette: success (green) ------------------------------------- */
+    /* Meaning: confirmed, passed, done. ONLY.                              */
+    --success: #37704a;
+    --success-subtle: #edf4ee;
+
+    /* ---- Palette: danger (red) ---------------------------------------- */
+    /* Meaning: errors, hazards, bugs, destructive actions. ONLY.           */
+    --danger: #a3403a;
+    --danger-subtle: #f9eeec;
+
+    /* ---- Palette: example (violet) ------------------------------------ */
+    /* Meaning: worked examples / specimens. ONLY.                          */
+    --example: #67588f;
+    --example-subtle: #f2f0f7;
 
     /* ---- Palette: code / technical surfaces --------------------------- */
     --code-background: #ecedea;
@@ -144,7 +161,7 @@
     --secondary-foreground: var(--text);
     --muted: var(--code-background);
     --muted-foreground: var(--text-muted);
-    --destructive: var(--warning); /* the palette's only alarm colour      */
+    --destructive: var(--danger);
     --input: var(--border-strong);
     --ring: var(--accent); /* matches the base.css focus ring              */
     --chart-1: var(--accent);
@@ -186,6 +203,12 @@
         --accent-subtle: #1d2a33;
         --warning: #d29a5b;
         --warning-subtle: #2c2519;
+        --success: #7fb58f;
+        --success-subtle: #1b2a20;
+        --danger: #e08a80;
+        --danger-subtle: #321e1c;
+        --example: #a797cf;
+        --example-subtle: #252130;
         --code-background: #232629;
         --grid-line: rgba(111, 163, 194, 0.05);
         --grid-line-faint: rgba(111, 163, 194, 0.025);

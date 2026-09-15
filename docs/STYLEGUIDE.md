@@ -69,6 +69,12 @@ There is no global "utilities" soup and no Tailwind.
 | `--accent-subtle`   | `#E7EFF3` | Pale wash behind accented surfaces         |
 | `--warning`         | `#A66A24` | Failed experiments / warnings **only**     |
 | `--warning-subtle`  | `#F5EBDD` | Warning washes                             |
+| `--success`         | `#37704A` | Confirmed / passed / done **only**         |
+| `--success-subtle`  | `#EDF4EE` | Success washes                             |
+| `--danger`          | `#A3403A` | Errors, hazards, bugs **only**             |
+| `--danger-subtle`   | `#F9EEEC` | Danger washes                              |
+| `--example`         | `#67588F` | Worked examples / specimens **only**       |
+| `--example-subtle`  | `#F2F0F7` | Example washes                             |
 | `--code-background` | `#ECEDEA` | Code / technical surfaces                  |
 
 ### Typography
@@ -120,9 +126,35 @@ Colour carries meaning here. Use it by what the thing **is**, not by taste.
 | Observation / explanation                 | Charcoal | `--text*`   | Body copy, `Callout` note  |
 | Discovery / implementation / links        | Blue     | `--accent`  | Links, `Callout` discovery |
 | Failed experiment / warning / unexpected  | Amber    | `--warning` | `Callout` failed / warning |
+| Confirmed / passed / done                 | Green    | `--success` | Markdown callouts          |
+| Error / hazard / bug                      | Red      | `--danger`  | Markdown callouts          |
+| Worked example / specimen                 | Violet   | `--example` | Markdown callouts          |
 
 This maps directly onto `<Callout variant="…">` — see below. The blue is an
 accent, not the primary text colour; if a page looks blue, pull it back.
+
+Markdown callouts (`> [!type] Title`) follow the same language and build on
+`<Callout>`'s look. Colour carries the meaning; typography and the left rule
+separate types that share a colour:
+
+| Types                              | Colour   | Treatment                                         |
+| ---------------------------------- | -------- | ------------------------------------------------- |
+| `note`, `info`                     | Charcoal | Mono label                                        |
+| `abstract`/`summary`/`tldr`        | Ink      | No wash, sans headline title, body in ink         |
+| `todo`                             | Charcoal | Dashed rule, no wash — unfinished                 |
+| `question`/`help`/`faq`            | Blue     | Dashed rule, no wash, italic headline title       |
+| `quote`/`cite`                     | Charcoal | No box — a rule and italic ink                    |
+| `example`                          | Violet   | Mono label                                        |
+| `tip`/`hint`                       | Blue     | Mono label                                        |
+| `important`                        | Blue     | Mono label, body in ink                           |
+| `success`/`check`/`done`           | Green    | Mono label                                        |
+| `warning`/`attention`/`caution`    | Amber    | Mono label                                        |
+| `failure`/`fail`/`missing`         | Amber    | Sans headline title (like `<Callout variant="failed">`) |
+| `danger`/`error`                   | Red      | Mono label                                        |
+| `bug`                              | Red      | Dashed rule                                       |
+
+`console` is for captured terminal output — put the output in an `ansi` code
+fence so its colours survive. Callout styles live in `Prose.astro`.
 
 ---
 
