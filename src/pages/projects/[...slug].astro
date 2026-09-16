@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { lastUpdated } from '../../lib/post-dates.js';
 
 export async function getStaticPaths() {
     const posts = await getCollection('projects');
@@ -15,6 +16,6 @@ const post = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data} slug={post.id}>
+<BlogPost {...post.data} slug={post.id} updatedDate={lastUpdated(post)}>
     <Content />
 </BlogPost>

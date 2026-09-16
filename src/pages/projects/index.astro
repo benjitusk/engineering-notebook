@@ -6,13 +6,22 @@ import Eyebrow from '../../components/Eyebrow.astro';
 import Section from '../../components/Section.astro';
 import ProjectList from '../../components/ProjectList.astro';
 import ProjectListItem from '../../components/ProjectListItem.astro';
+import ProjectSort from '../../components/ProjectSort.tsx';
+import { lastUpdated } from '../../lib/post-dates.js';
 import { SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('projects'))
+const entries = (await getCollection('projects'))
     .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    .map((post) => ({ post, updated: lastUpdated(post) }));
 
+type Entry = (typeof entries)[number];
+const touched = (entry: Entry) => (entry.updated ?? entry.post.data.pubDate).valueOf();
 
+// The list is rendered in publish order; the sort control reorders it with CSS.
+const byPublished = [...entries].sort((a, b) => b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf());
+const updatedOrder = new Map(
+    [...entries].sort((a, b) => touched(b) - touched(a)).map((entry, index) => [entry.post.id, index])
+);
 ---
 
 <BaseLayout
@@ -20,6 +29,15 @@ const posts = (await getCollection('projects'))
     description='Projects, experiments, and investigations from the notebook.'
     width='page'
 >
+    <script is:inline>
+        // Apply the saved sort before the list paints, so it doesn't reshuffle.
+        try {
+            if (localStorage.getItem('project-sort') === 'updated') {
+                document.documentElement.dataset.projectSort = 'updated';
+            }
+        } catch {}
+    </script>
+
     <Hero title='Projects'>
         <Eyebrow slot='eyebrow' tone='accent'>The notebook</Eyebrow>
         <Fragment slot='lede'>
@@ -29,13 +47,21 @@ const posts = (await getCollection('projects'))
     </Hero>
 
     <Section>
-        <ProjectList>
+        <div class='listing-controls'>
+            <ProjectSort client:idle />
+        </div>
+
+        <ProjectList sortable>
             {
-                posts.map((post, index) => (
+                byPublished.map(({ post, updated }, index) => (
                     <ProjectListItem
-                        number={post.data.number ?? String(posts.length - index).padStart(2, '0')}
+                        number={post.data.number ?? String(byPublished.length - index).padStart(2, '0')}
                         title={post.data.title}
                         href={`/projects/${post.id}/`}
+                        pubDate={post.data.pubDate}
+                        updatedDate={updated}
+                        orderPublished={index}
+                        orderUpdated={updatedOrder.get(post.id)}
                     >
                         {post.data.description}
                     </ProjectListItem>
@@ -44,3 +70,11 @@ const posts = (await getCollection('projects'))
         </ProjectList>
     </Section>
 </BaseLayout>
+
+<style>
+    .listing-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: var(--space-4);
+    }
+</style>

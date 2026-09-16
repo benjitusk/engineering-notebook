@@ -13,7 +13,10 @@ jobs:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     steps:
+      # Full history: posts' "last updated" dates come from git log.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Node 22 (a dependency needs >= 22.19). `cache: npm` caches ~/.npm keyed
       # on package-lock.json, so `npm ci` doesn't re-download every package.

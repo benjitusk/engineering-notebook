@@ -10,13 +10,17 @@
  * </ProjectList>
  */
 interface Props {
+    /** Let items be reordered by the sort control (see ProjectSort). Items
+     *  supply `orderPublished` / `orderUpdated`; the DOM stays in publish
+     *  order, so the list reads correctly without JavaScript. */
+    sortable?: boolean;
     class?: string;
 }
 
-const { class: className } = Astro.props;
+const { sortable, class: className } = Astro.props;
 ---
 
-<ol class:list={['project-list', className]}>
+<ol class:list={['project-list', className]} data-sortable={sortable ? '' : undefined}>
     <slot />
 </ol>
 
@@ -25,5 +29,16 @@ const { class: className } = Astro.props;
         margin: 0;
         border-top: var(--border-width) solid var(--border);
         counter-reset: investigation;
+    }
+
+    .project-list[data-sortable] {
+        display: flex;
+        flex-direction: column;
+    }
+    .project-list[data-sortable] > :global(li) {
+        order: var(--order-published, 0);
+    }
+    :global(:root[data-project-sort='updated']) .project-list[data-sortable] > :global(li) {
+        order: var(--order-updated, 0);
     }
 </style>

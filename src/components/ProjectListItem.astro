@@ -3,24 +3,50 @@
  * ProjectListItem — one row in a ProjectList. Must be a direct child of
  * <ProjectList>. Description goes in the default slot.
  */
+import FormattedDate from './FormattedDate.astro';
+
 interface Props {
     title: string;
     href: string;
     /** Override the auto-generated number (e.g. "07"). */
     number?: string;
+    pubDate?: Date;
+    /** Computed by src/lib/post-dates.js; shown after the publish date. */
+    updatedDate?: Date;
+    /** Row positions for each sort order (see ProjectList's `sortable`). */
+    orderPublished?: number;
+    orderUpdated?: number;
     class?: string;
 }
 
-const { title, href, number, class: className } = Astro.props;
+const { title, href, number, pubDate, updatedDate, orderPublished, orderUpdated, class: className } = Astro.props;
 const auto = number === undefined;
+const order =
+    orderPublished === undefined
+        ? undefined
+        : `--order-published:${orderPublished};--order-updated:${orderUpdated ?? orderPublished}`;
 ---
 
-<li class:list={['pli', className]}>
+<li class:list={['pli', className]} style={order}>
     <a href={href} class='pli__link'>
         <span class='pli__num' data-auto={auto}>{number}</span>
         <span class='pli__body'>
             <span class='pli__title'>{title}</span>
             <span class='pli__desc'><slot /></span>
+            {
+                (pubDate || updatedDate) && (
+                    <span class='pli__meta'>
+                        {pubDate && <FormattedDate date={pubDate} />}
+                        {updatedDate && (
+                            <>
+                                <span aria-hidden='true'> · </span>
+                                {'updated '}
+                                <FormattedDate date={updatedDate} />
+                            </>
+                        )}
+                    </span>
+                )
+            }
         </span>
         <span class='pli__arrow' aria-hidden='true'>↗</span>
     </a>
@@ -71,6 +97,15 @@ const auto = number === undefined;
         max-width: 600px;
         color: var(--text-muted);
         line-height: var(--leading-normal);
+    }
+
+    .pli__meta {
+        display: block;
+        margin-top: var(--space-3);
+        color: var(--text-subtle);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        letter-spacing: var(--tracking-wide);
     }
 
     .pli__arrow {
