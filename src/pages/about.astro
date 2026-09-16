@@ -11,23 +11,43 @@ import { GITHUB_URL } from '../consts';
     <Hero title='About'>
         <Eyebrow slot='eyebrow' tone='accent'>Who's writing this</Eyebrow>
         <Fragment slot='lede'>
-            I'm Benji, a computer science graduate who likes taking things apart to see how they work.
+            I'm Benji, a software engineer in Jerusalem who likes taking things apart to see how they work.
         </Fragment>
     </Hero>
 
     <Prose>
         <p>
+            Most of my time goes into <a href='https://schedulearn.com' target='_blank' rel='noopener noreferrer'
+                >ScheduLearn</a
+            >, a scheduling tool for schools that I cofounded while I was still in university. I take care of the
+            backend and the cloud infrastructure it runs on, and the day-to-day frontend work too. I finished my BSc in
+            Mathematics and Computer Science at the Jerusalem College of Technology in 2026.
+        </p>
+        <p>
+            Outside of that, my projects have mostly been things I didn't know how to build when I started. For a long
+            time that meant software: browser games, WhatsApp and Reddit bots, an iOS Reddit client, and an app for the
+            yeshiva I studied at. A few of them ended up being used by real people. A lot of them never got finished,
+            which is fine, since that's usually where I learned the most.
+        </p>
+        <p>
+            More recently I've started getting into reverse engineering: figuring out how undocumented hardware,
+            protocols, and firmware work, and getting them to do things they weren't built to do. Those projects come
+            with even less certainty about how they'll turn out, which makes them a good fit for this notebook.
+        </p>
+
+        <h2>What this is</h2>
+        <p>
             This is my engineering notebook. I write about projects while I'm still working on them: what I tried, what
-            broke, and what I figured out along the way. I explain why in <a href='/projects/notebook-init/'
+            broke, and what I figured out along the way. It's not a portfolio, so expect unfinished prototypes, dead
+            ends, and investigations that don't have an ending yet. I explain why in <a href='/projects/notebook-init/'
                 >my first post</a
             >.
         </p>
-        <p>I'll write more here soon.</p>
 
         <h2>Get in touch</h2>
         <p>
             My code is on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can reach
-            me at <EmailLink />.
+            me at <EmailLink />. When I'm not at a computer, I'm usually rollerblading, reading, or out for a walk.
         </p>
     </Prose>
 </BaseLayout>
