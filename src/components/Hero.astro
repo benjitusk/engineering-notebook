@@ -12,15 +12,18 @@
 interface Props {
     /** The headline. Or omit and pass a "title" slot for rich markup. */
     title?: string;
+    /** Tighter bottom spacing, for pages where body content follows directly. */
+    compact?: boolean;
     class?: string;
 }
 
-const { title, class: className } = Astro.props;
+const { title, compact = false, class: className } = Astro.props;
 const hasEyebrow = Astro.slots.has('eyebrow');
 const hasLede = Astro.slots.has('lede');
+const hasBody = Astro.slots.has('default');
 ---
 
-<section class:list={['hero', className]}>
+<section class:list={['hero', { 'hero--compact': compact }, className]}>
     {
         hasEyebrow && (
             <div class='hero__eyebrow'>
@@ -39,15 +42,22 @@ const hasLede = Astro.slots.has('lede');
         )
     }
 
-    <div class='hero__body'>
-        <slot />
-    </div>
+    {
+        hasBody && (
+            <div class='hero__body'>
+                <slot />
+            </div>
+        )
+    }
 </section>
 
 <style>
     .hero {
         max-width: 760px;
         margin-bottom: var(--space-36);
+    }
+    .hero--compact {
+        margin-bottom: var(--space-16);
     }
 
     .hero__eyebrow {
@@ -86,6 +96,9 @@ const hasLede = Astro.slots.has('lede');
     @media (max-width: 600px) {
         .hero {
             margin-bottom: var(--space-24);
+        }
+        .hero--compact {
+            margin-bottom: var(--space-12);
         }
     }
 </style>

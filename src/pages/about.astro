@@ -8,7 +8,7 @@ import { GITHUB_URL } from '../consts';
 ---
 
 <BaseLayout title='About · Benji Tusk' description='About Benji Tusk and this engineering notebook.' width='prose'>
-    <Hero title='About'>
+    <Hero title='About' compact>
         <Eyebrow slot='eyebrow' tone='accent'>Who's writing this</Eyebrow>
         <Fragment slot='lede'>
             I'm Benji, a software engineer in Jerusalem who likes taking things apart to see how they work.
@@ -47,7 +47,8 @@ import { GITHUB_URL } from '../consts';
         <h2>Get in touch</h2>
         <p>
             My code is on <a href={GITHUB_URL} target='_blank' rel='noopener noreferrer'>GitHub</a>, and you can reach
-            me at <EmailLink />. When I'm not at a computer, I'm usually rollerblading, reading, or out for a walk.
+            me at <EmailLink />. If you're hiring, here's <a href='/benji-tusk-cv.pdf' download>my CV</a> (PDF). When I'm
+            not at a computer, I'm usually rollerblading, reading, or out for a walk.
         </p>
     </Prose>
 </BaseLayout>
