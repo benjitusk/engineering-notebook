@@ -1,9 +1,11 @@
 // @ts-check
-// Share cards for project posts: the post's hero — its `heroImage`, or the
-// generated figure from src/lib/hero — framed on notebook paper with the title
-// above it. Pages without a hero use the text cards in src/pages/og/[...route].ts.
+// Share cards for project posts: title, name and domain on the left, the post's
+// art full height on the right — its `heroImage`, its hand drawing (src/lib/art),
+// or the generated figure (src/lib/hero). Matches the design system's
+// LinkPreview card. Pages without a post use the text cards in
+// src/pages/og/[...route].ts.
 //
-// Rendering: resvg rasterises the hero SVG (it needs TTF fonts, hence the .ttf
+// Rendering: resvg rasterises the art SVG (it needs TTF fonts, hence the .ttf
 // copies of Plex Mono), then CanvasKit composes the card and sets the type.
 // Plain JavaScript so scripts can render cards without Astro.
 
@@ -18,11 +20,12 @@ const require = createRequire(import.meta.url);
 
 const W = 1200;
 const H = 630;
-const PAD = 64;
+const PAD = 72;
+const PANEL_W = 496;
 const FONTS = './src/assets/og';
 
 // Branding from src/consts.ts and the site URL in astro.config.mjs.
-const BRAND = { name: 'BENJI TUSK', subtitle: 'ENGINEERING NOTEBOOK', domain: 'notebook.benjitusk.com' };
+const BRAND = { name: 'Benji Tusk', subtitle: 'ENGINEERING NOTEBOOK', domain: 'notebook.benjitusk.com' };
 
 /** @type {Promise<any> | undefined} */
 let canvasKitPromise;
@@ -44,15 +47,15 @@ async function setup() {
 }
 
 /**
- * Rasterise the hero: a raster file as is, or the SVG figure via resvg.
+ * Rasterise the art: a raster file as is, or an SVG via resvg.
  * @param {any} CK
- * @param {{ heroSvg?: string, heroImagePath?: string }} hero
+ * @param {{ artSvg?: string, heroImagePath?: string }} art
  * @param {number} width Target width in card pixels (rendered at 2× for sharpness).
  */
-async function loadHero(CK, { heroSvg, heroImagePath }, width) {
+async function loadArt(CK, { artSvg, heroImagePath }, width) {
     if (heroImagePath) return CK.MakeImageFromEncoded(await fs.readFile(heroImagePath));
-    if (!heroSvg) return null;
-    const png = new Resvg(heroSvg, {
+    if (!artSvg) return null;
+    const png = new Resvg(artSvg, {
         fitTo: { mode: 'width', value: Math.round(width * 2) },
         font: {
             fontFiles: [`${FONTS}/IBMPlexMono-Regular.ttf`, `${FONTS}/IBMPlexMono-SemiBold.ttf`],
@@ -69,11 +72,13 @@ async function loadHero(CK, { heroSvg, heroImagePath }, width) {
  * Render a post's share card.
  * @param {object} input
  * @param {string} input.title
- * @param {string} [input.heroSvg] Hero figure SVG, rendered with a literal palette (not CSS tokens).
- * @param {string} [input.heroImagePath] A raster hero image on disk; takes precedence over `heroSvg`.
+ * @param {string} [input.artSvg] The post's art as SVG, rendered with a literal palette (not CSS tokens).
+ * @param {'cover' | 'contain'} [input.fit] `cover` crops the art to fill the panel (hand drawings, photos);
+ *   `contain` shows it whole on paper (the 2:1 generated figures, so their title block stays visible).
+ * @param {string} [input.heroImagePath] A raster hero image on disk; takes precedence over `artSvg`.
  * @returns {Promise<Uint8Array>} PNG bytes.
  */
-export async function renderPostCard({ title, heroSvg, heroImagePath }) {
+export async function renderPostCard({ title, artSvg, fit = 'cover', heroImagePath }) {
     const { CK, fontMgr } = await setup();
     const surface = CK.MakeSurface(W, H);
     const canvas = surface.getCanvas();
@@ -87,45 +92,7 @@ export async function renderPostCard({ title, heroSvg, heroImagePath }) {
         return p;
     };
 
-    const full = CK.XYWHRect(0, 0, W, H);
-
-    // Paper that darkens slightly towards the bottom.
-    const shade = new CK.Paint();
-    shade.setShader(
-        CK.Shader.MakeLinearGradient(
-            [0, 0],
-            [0, H],
-            [color(LIGHT.paper), color(LIGHT.paper), color(LIGHT.code), color(LIGHT.rule)],
-            [0, 0.3, 0.8, 1],
-            CK.TileMode.Clamp
-        )
-    );
-    canvas.drawRect(full, shade);
-
-    // Graph paper (8px minor under 32px major) that fades out towards the
-    // bottom: draw it on a layer, then mask the layer with a vertical fade.
-    canvas.saveLayer();
-    const minor = paint(LIGHT.accent, 0.045);
-    const major = paint(LIGHT.accent, 0.11);
-    for (const p of [minor, major]) {
-        p.setStrokeWidth(1);
-        p.setAntiAlias(false);
-    }
-    for (let x = 0; x <= W; x += 8) canvas.drawLine(x + 0.5, 0, x + 0.5, H, x % 32 === 0 ? major : minor);
-    for (let y = 0; y <= H; y += 8) canvas.drawLine(0, y + 0.5, W, y + 0.5, y % 32 === 0 ? major : minor);
-    const fade = new CK.Paint();
-    fade.setBlendMode(CK.BlendMode.DstIn);
-    fade.setShader(
-        CK.Shader.MakeLinearGradient(
-            [0, 0],
-            [0, H * 0.9],
-            [CK.Color(0, 0, 0, 1), CK.Color(0, 0, 0, 0)],
-            null,
-            CK.TileMode.Clamp
-        )
-    );
-    canvas.drawRect(full, fade);
-    canvas.restore();
+    canvas.drawRect(CK.XYWHRect(0, 0, W, H), paint(LIGHT.paper));
 
     /**
      * @param {[string, string][]} runs [text, hex colour] pairs
@@ -155,70 +122,65 @@ export async function renderPostCard({ title, heroSvg, heroImagePath }) {
         return para;
     };
 
-    // Brand row.
-    const mono = ['IBM Plex Mono'];
-    const brand = paragraph(
-        [
-            [BRAND.name, LIGHT.ink],
-            [`  ·  ${BRAND.subtitle}`, LIGHT.subtle],
-        ],
-        { families: mono, size: 18, weight: 'SemiBold', letterSpacing: 18 * 0.15 },
-        W
-    );
-    const domain = paragraph([[BRAND.domain, LIGHT.accent]], { families: mono, size: 19, weight: 'Normal' }, W);
-    canvas.drawParagraph(brand, PAD, 44);
-    canvas.drawParagraph(domain, W - PAD - domain.getMaxIntrinsicWidth(), 43);
+    // Art panel, full height on the right.
+    const panelX = W - PANEL_W;
+    const image = await loadArt(CK, { artSvg, heroImagePath }, fit === 'cover' ? H : PANEL_W);
+    if (image) {
+        const [iw, ih] = [image.width(), image.height()];
+        canvas.save();
+        canvas.clipRect(CK.XYWHRect(panelX, 0, PANEL_W, H), CK.ClipOp.Intersect, true);
+        if (fit === 'cover') {
+            // Crop the source to the panel's aspect ratio, centred.
+            const scale = Math.max(PANEL_W / iw, H / ih);
+            const [sw, sh] = [PANEL_W / scale, H / scale];
+            canvas.drawImageRectOptions(
+                image,
+                CK.XYWHRect((iw - sw) / 2, (ih - sh) / 2, sw, sh),
+                CK.XYWHRect(panelX, 0, PANEL_W, H),
+                CK.FilterMode.Linear,
+                CK.MipmapMode.Linear,
+                null
+            );
+        } else {
+            // Whole, centred vertically on the paper.
+            const dh = (PANEL_W / iw) * ih;
+            canvas.drawImageRectOptions(
+                image,
+                CK.XYWHRect(0, 0, iw, ih),
+                CK.XYWHRect(panelX, (H - dh) / 2, PANEL_W, dh),
+                CK.FilterMode.Linear,
+                CK.MipmapMode.Linear,
+                null
+            );
+        }
+        canvas.restore();
+    }
+    const divider = paint(LIGHT.rule);
+    divider.setStrokeWidth(1);
+    canvas.drawLine(panelX + 0.5, 0, panelX + 0.5, H, divider);
 
-    // Title, up to two lines.
-    const titleTop = 90;
+    // Text column on the left.
+    const textW = panelX - PAD * 2;
+    const eyebrow = paragraph([[BRAND.subtitle, LIGHT.accent]], {
+        families: ['IBM Plex Mono'],
+        size: 20,
+        weight: 'SemiBold',
+        letterSpacing: 20 * 0.15,
+    }, textW);
+    canvas.drawParagraph(eyebrow, PAD, PAD);
+
     const heading = paragraph(
         [[title, LIGHT.ink]],
-        { families: ['IBM Plex Sans'], size: 46, weight: 'Bold', lineHeight: 1.12, maxLines: 2 },
-        W - PAD * 2
+        { families: ['IBM Plex Sans'], size: 58, weight: 'Bold', lineHeight: 1.06, letterSpacing: 58 * -0.02, maxLines: 5 },
+        textW
     );
-    canvas.drawParagraph(heading, PAD, titleTop);
+    canvas.drawParagraph(heading, PAD, PAD + eyebrow.getHeight() + 32);
 
-    // Hero frame: as large as fits below the title at 2:1, whole (not cropped),
-    // so the figure's title block stays visible.
-    const top = titleTop + heading.getHeight() + 30;
-    let frameH = H - 40 - top;
-    let frameW = frameH * 2;
-    if (frameW > W - PAD * 2) {
-        frameW = W - PAD * 2;
-        frameH = frameW / 2;
-    }
-    const frameX = (W - frameW) / 2;
-    const radius = 14;
-    const frame = CK.RRectXY(CK.XYWHRect(frameX, top, frameW, frameH), radius, radius);
-
-    const shadow = paint(LIGHT.ink, 0.16);
-    shadow.setMaskFilter(CK.MaskFilter.MakeBlur(CK.BlurStyle.Normal, 18, true));
-    canvas.drawRRect(CK.RRectXY(CK.XYWHRect(frameX, top + 12, frameW, frameH), radius, radius), shadow);
-
-    const image = await loadHero(CK, { heroSvg, heroImagePath }, frameW);
-    canvas.save();
-    canvas.clipRRect(frame, CK.ClipOp.Intersect, true);
-    canvas.drawRect(CK.XYWHRect(frameX, top, frameW, frameH), paint(LIGHT.surface));
-    if (image) {
-        // Cover-fit: crop the source to the frame's aspect ratio, centred.
-        const [iw, ih] = [image.width(), image.height()];
-        const scale = Math.max(frameW / iw, frameH / ih);
-        const [sw, sh] = [frameW / scale, frameH / scale];
-        canvas.drawImageRectOptions(
-            image,
-            CK.XYWHRect((iw - sw) / 2, (ih - sh) / 2, sw, sh),
-            CK.XYWHRect(frameX, top, frameW, frameH),
-            CK.FilterMode.Linear,
-            CK.MipmapMode.Linear,
-            null
-        );
-    }
-    canvas.restore();
-
-    const border = paint(LIGHT.ruleStrong);
-    border.setStyle(CK.PaintStyle.Stroke);
-    border.setStrokeWidth(1.5);
-    canvas.drawRRect(frame, border);
+    const name = paragraph([[BRAND.name, LIGHT.ink]], { families: ['IBM Plex Sans'], size: 26, weight: 'Bold' }, textW);
+    const domain = paragraph([[BRAND.domain, LIGHT.muted]], { families: ['IBM Plex Mono'], size: 20, weight: 'Normal' }, textW);
+    const bylineY = H - PAD - name.getHeight();
+    canvas.drawParagraph(name, PAD, bylineY);
+    canvas.drawParagraph(domain, PAD + name.getMaxIntrinsicWidth() + 16, bylineY + (name.getAlphabeticBaseline() - domain.getAlphabeticBaseline()));
 
     const bytes = surface.makeImageSnapshot().encodeToBytes(CK.ImageFormat.PNG, 100);
     surface.dispose();

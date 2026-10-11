@@ -26,6 +26,7 @@ import yaml from 'js-yaml';
 import sharp from 'sharp';
 import { MOTIFS, renderHero } from '../src/lib/hero/index.js';
 import { DARK, LIGHT, TOKENS } from '../src/lib/hero/palette.js';
+import { renderDrawing } from '../src/lib/art/index.js';
 import { renderPostCard } from '../src/lib/og/post-card.js';
 
 const CONTENT_DIR = 'src/content/projects';
@@ -101,9 +102,16 @@ for (const post of posts) {
             await sharp(Buffer.from(svg), { density: 192 }).png().toFile(path.join(outDir, `${name}.png`));
         }
         if (args.og) {
-            // Same renderer as /og/projects/<slug>.png; a heroImage wins over the figure.
+            // Same renderer as /og/projects/<slug>.png: a heroImage wins, then the
+            // post's hand drawing (src/lib/art), then this generated figure.
             const heroImagePath = post.heroImage ? path.resolve(CONTENT_DIR, String(post.heroImage)) : undefined;
-            const card = await renderPostCard({ title: post.title, heroSvg: heroImagePath ? undefined : svg, heroImagePath });
+            const drawing = renderDrawing(post.slug, { palette: LIGHT });
+            const card = await renderPostCard({
+                title: post.title,
+                artSvg: heroImagePath ? undefined : (drawing ?? svg),
+                fit: drawing || heroImagePath ? 'cover' : 'contain',
+                heroImagePath,
+            });
             await fs.writeFile(path.join(outDir, `${name}.og.png`), card);
         }
         figures.push({ post, name, motif, source, seed, options });
