@@ -60,8 +60,8 @@ no result. After some digging, I found out the containers were being OOM-killed:
 the container was terminated on the spot. A process killed like that never reaches its own error handler, so
 nothing ever told the client the solve was over.
 
-There were two separate problems here. One is that the client should never hang, no matter how a solve dies. I'm working on a
-watchdog for that, and it deserves its own post. This post is about the other one: these schools needed more memory
+There were two separate problems here. One is that the client should never hang, no matter how a solve dies. [I'm working on a
+watchdog for that, and it deserves its own post](/projects/solver-watchdog/). This post is about the other one: these schools needed more memory
 than we were giving them.
 
 The big schools ran out of memory in the Cloud Function's 16 GB, and sometimes even in Cloud Run's 32 GB, which is
