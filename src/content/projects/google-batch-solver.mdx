@@ -1,0 +1,197 @@
+---
+title: Moving our biggest schedules to Google Batch
+description: Why ScheduLearn's largest schools outgrew Cloud Functions and Cloud Run, what it took to run the solver on Google Batch, and two defaults that would have quietly wasted the hardware.
+pubDate: 2026-10-10
+status: Production
+tags: ['GCP', 'Google Batch', 'Cloud Run', 'Cloud Functions', 'CP-SAT', 'Infrastructure']
+meta:
+    Status: Production
+    Platform: Google Cloud
+    Language: TypeScript
+draft: false
+work: true
+---
+
+import Callout from '../../components/Callout.astro';
+
+## Some context
+
+[ScheduLearn](https://schedulearn.com) is the school scheduling software I cofounded. A school's scheduler enters their teachers,
+rooms, students, groups, and constraints, and the software either builds a timetable that satisfies all of it or
+explains why it can't.
+
+The scheduling itself is a constraint model built on Google OR-Tools' CP-SAT solver. My cofounders Eliyahu and Eyal
+lead the design of that model. My part is everything around it: where the solver runs, how it gets started and
+stopped, and how its progress gets back to the person waiting in the browser.
+
+This post is about where the solver runs, and what happened when some schools got big enough that it stopped being
+a boring question.
+
+## How we got here
+
+The solver has moved a few times already.
+
+**AWS Lightsail.** The first version was a server on Lightsail that was always running. The browser sent a solve
+request over HTTP, and the server held the connection open until it had a result. That stopped working once solves
+started taking more than an hour (this was before we overhauled the backend's efficiency), because the HTTP
+connection would time out first.
+
+**WebSockets.** We switched to WebSockets, which got around the timeout, but we still weren't happy with the setup.
+
+**Cloud Run.** Then we moved to GCP and ran each solve as a Cloud Run job. That worked well, because it scaled:
+every solve got its own container. The downside was startup time. Every solve waited about 3 minutes for a container
+to be provisioned before the solver even started.
+
+**Cloud Functions and Cloud Run.** Since February 2025, the browser calls a Firebase Cloud Function, which sends the
+solve to one of two places based on its time limit (the scheduler sets this in the editor):
+
+- **Up to 45 minutes:** a Cloud Function, which runs the entire solve inside a single HTTP request on 8 vCPUs and
+  16 GB of memory. Cloud Functions time out at 60 minutes, so the cutoff leaves some margin. There's no container to
+  provision, so it starts in under a second.
+- **Over 45 minutes:** a Cloud Run job, on 8 vCPUs and 32 GB. The function starts the job, saves its ID so we can
+  cancel it later, and returns right away. The solver reports progress through Firestore while it runs.
+
+This worked fine for most schools, but not for the biggest ones.
+
+## The problem
+
+Solves for some of our largest schools started going offline. The client would sit on "Solving" with no error and
+no result. After some digging, I found out the containers were being OOM-killed: the solver ran out of memory and
+the container was terminated on the spot. A process killed like that never reaches its own error handler, so
+nothing ever told the client the solve was over.
+
+There were two separate problems here. One is that the client should never hang, no matter how a solve dies. I'm working on a
+watchdog for that, and it deserves its own post. This post is about the other one: these schools needed more memory
+than we were giving them.
+
+The big schools ran out of memory in the Cloud Function's 16 GB, and sometimes even in Cloud Run's 32 GB, which is
+the largest container Cloud Run offers. On Cloud Run, a full run took over two hours, when it wasn't killed first.
+
+CP-SAT is a portfolio solver, meaning it runs several different search strategies on the same problem at once,
+instead of splitting one search across the cores. With `num_workers = 0` it starts one
+search worker per CPU it can see, and the workers share what they've learned with each other throughout the search.
+A much bigger machine would give us more memory to stop the kills, and more cores for more strategies to run in
+parallel.
+
+## Why Google Batch
+
+Google Batch runs a container on a Compute Engine VM that you choose, then tears it down when the job finishes.
+That made it a third dispatch location next to Cloud Functions and Cloud Run, except that we get to pick the
+hardware.
+
+It's also the most expensive option by a long way, so it's admin-only. A normal user can't send a solve to Batch.
+The check lives in the Cloud Function, not just in the UI, so a modified client can't get around it. Admins dispatch
+Batch solves from an internal launchpad page, where they pick the machine type and an optional time limit.
+
+Stripped down, starting a job looks like this:
+
+```ts
+const [response] = await batchClient.createJob({
+    parent: `projects/${PROJECT}/locations/${REGION}`,
+    jobId: `solver-${executionID}`.toLowerCase(),
+    job: {
+        taskGroups: [
+            {
+                taskCount: 1,
+                taskSpec: {
+                    maxRetryCount: 0,
+                    maxRunDuration: { seconds: infraTimeout },
+                    computeResource: { cpuMilli, memoryMib },
+                    environment: { variables: envvars },
+                    runnables: [{ container: { imageUri } }],
+                },
+            },
+        ],
+        allocationPolicy: {
+            instances: [{ policy: { machineType } }],
+        },
+    },
+});
+```
+
+Most of that is what you'd expect. Two of those fields were not obvious to me at first, and both exist because
+without them the job runs on far less hardware than you think you asked for.
+
+## Default 1: a big VM doesn't mean a big task
+
+<Callout variant='warning' title='Left unset, Batch gives your task 2 CPUs and 2 GB, no matter how big the VM is.'>
+    If you don't set `computeResource`, Batch falls back to its default task budget of 2000 milliCPU and 2000 MiB.
+    Picking a 32-core machine type doesn't change that.
+</Callout>
+
+This one is sneaky, because nothing fails. You'd ask for a 32-core VM, pay for a 32-core VM, and give the solver a
+small slice of it.
+
+So `cpuMilli` and `memoryMib` aren't something the caller passes in. They're derived from the machine type, from one
+table, so the machine and the task budget can't disagree:
+
+```ts
+export const BATCH_MACHINES = {
+    'e2-standard-2': { cpuMilli: 2_000, memoryMib: 8 << 10 },
+    'e2-standard-4': { cpuMilli: 4_000, memoryMib: 16 << 10 },
+    't2d-standard-8': { cpuMilli: 8_000, memoryMib: 32 << 10 },
+    't2d-standard-16': { cpuMilli: 16_000, memoryMib: 64 << 10 },
+    't2d-standard-32': { cpuMilli: 32_000, memoryMib: 128 << 10 },
+    't2d-standard-60': { cpuMilli: 60_000, memoryMib: 240 << 10 },
+    'h4d-standard-192': { cpuMilli: 192_000, memoryMib: 720 << 10 },
+} as const;
+```
+
+The machine type is also checked against this table inside the Cloud Function before anything is sent to Google.
+A typo there would otherwise show up as a vague provisioning failure several minutes later.
+
+## Default 2: not all vCPUs are cores
+
+On most Compute Engine machine families, a vCPU is a hyperthread
+(<abbr title="Simultaneous multithreading">SMT</abbr>), so two vCPUs share one physical core and its
+L1/L2 cache. CP-SAT's workers spend a lot of their time exchanging state, so I expect it to care more about memory
+bandwidth and cache than about raw thread count.
+
+You can't turn SMT off from a Batch job request. The instance policy lets you set the machine type, minimum CPU platform,
+provisioning model, accelerators, disks, and reservation, but there's no `threadsPerCore`. The only way to get
+one worker per physical core, short of maintaining a Compute Engine instance template, was to pick a machine family
+that doesn't have SMT. T2D and H4D both map one vCPU to one physical core, so the solve shapes come from those two
+families. The `check` job (the infeasibility check) is single-threaded, so it gets a cheap `e2` machine instead.
+
+Pinning the machine type matters for the same reason. If you leave it out, Batch picks a shape for you, and early on
+that's how our jobs ended up on whatever general-purpose machine happened to fit.
+
+I haven't benchmarked this. I haven't run the same school on an SMT machine with the same vCPU count, so the
+reasoning above is a hypothesis and not a measured result.
+
+## Smaller things that broke
+
+<Callout variant='failed' title='I copied the Cloud Run job path pattern, and it was wrong for Batch.'>
+    For Cloud Run, our config builds a path to a named, long-lived job (one for staging, one for production), so I did
+    the same for Batch. But Batch jobs aren't long-lived. Each solve creates its own job named after the execution ID,
+    and `createJob` appends `/jobs/{jobId}` to the parent itself. Passing a job path as the parent produced a name with
+    `jobs/jobs` in it. The fix was to pass just the region as the parent.
+</Callout>
+
+- **Auth.** The solver container authenticates to Firebase with the VM's service account, so jobs now run as a
+  dedicated solver service account with the `cloud-platform` scope. Without that scope, the VM gets the restricted
+  default Compute Engine scopes and the IAM roles on the account don't apply.
+- **Cancellation.** Canceling a Batch job needed its own path, separate from Cloud Run's, including treating
+  "already finished" as a normal outcome instead of an error.
+- **Timeouts.** There are now two limits. The solver gets a time budget and stops cleanly when it runs out, writing
+  out the best schedule it has. Five minutes later, `maxRunDuration` kills the VM if it hasn't stopped.
+
+## Results
+
+For a few of our largest schools, a full run that took over two hours on Cloud Run now takes about 15 minutes on
+an `h4d-standard-192`.
+
+|          | Cloud Run      | Google Batch                          |
+| -------- | -------------- | ------------------------------------- |
+| Machine  | 8 vCPU / 32 GB | `h4d-standard-192` (192 vCPU / 720 GB) |
+| Full run | 2+ hours       | ~15 minutes                           |
+
+This isn't an apples-to-apples comparison. The Batch machine has 24 times the cores and over 20 times the memory,
+and I haven't measured how much of the speedup comes from each, or from not having SMT. Most of the improvement is
+probably just the bigger machine. It also costs a lot more per hour, which is why it's still admin-only.
+
+<Callout variant='note' label='Still open'>
+    Right now an admin decides when a school goes to Batch and on what machine. We're evaluating pre-solve
+    heuristics that would look at a school before solving and pick the most time- and cost-effective platform
+    automatically.
+</Callout>
