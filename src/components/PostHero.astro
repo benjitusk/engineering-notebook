@@ -1,11 +1,12 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { renderHero } from '../lib/hero/index.js';
+import { renderPostArt } from '../lib/art/index.js';
 
 /**
- * PostHero — the generated figure at the top of a project post (see
- * src/lib/hero). Deterministic per post; tweak it with `hero` in frontmatter
- * and preview variations with `npm run hero`.
+ * PostHero — the figure at the top of a project post: its hand drawing
+ * (src/lib/art) on a 2:1 sheet of graph paper, or, for a post without one,
+ * the generated figure (src/lib/hero). Tweak a generated figure with `hero`
+ * in frontmatter and preview variations with `npm run hero`.
  */
 type Data = CollectionEntry<'projects'>['data'];
 
@@ -21,7 +22,7 @@ interface Props {
 }
 
 const { class: className, ...post } = Astro.props;
-const { svg } = renderHero(post);
+const { svg } = renderPostArt(post, { shape: 'wide' });
 ---
 
 <figure class:list={['post-hero-figure', className]} set:html={svg} />

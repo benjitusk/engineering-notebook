@@ -1,0 +1,37 @@
+---
+import { renderPostArt } from '../lib/art/index.js';
+import type { HeroPost } from '../lib/art/types';
+
+/**
+ * PostArt — a post's picture filling its container: the hand drawing
+ * (src/lib/art), cropped to fit, or the generated hero figure, shown whole.
+ * The container sets the size; this fills it.
+ */
+interface Props {
+    post: HeroPost;
+    /** Distinguishes two copies of the same post's art on one page. */
+    id?: string;
+    class?: string;
+}
+
+const { post, id, class: className } = Astro.props;
+const { svg, kind } = renderPostArt(post, { id: id ? `${post.slug}-${id}` : undefined });
+---
+
+<span class:list={['post-art', className]} data-kind={kind} set:html={svg} />
+
+<style>
+    .post-art {
+        position: absolute;
+        inset: 0;
+        display: block;
+        overflow: hidden;
+        background: var(--background);
+    }
+
+    .post-art :global(svg) {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+</style>

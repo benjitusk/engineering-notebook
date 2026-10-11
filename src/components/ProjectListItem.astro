@@ -1,9 +1,13 @@
 ---
 /**
  * ProjectListItem — one row in a ProjectList. Must be a direct child of
- * <ProjectList>. Description goes in the default slot.
+ * <ProjectList>. Description goes in the default slot. Pass `art` (the post)
+ * to show a thumbnail of its drawing in place of the number column; the
+ * number then moves into the meta line.
  */
 import FormattedDate from './FormattedDate.astro';
+import PostArt from './PostArt.astro';
+import type { HeroPost } from '../lib/art/types';
 
 interface Props {
     title: string;
@@ -16,10 +20,12 @@ interface Props {
     /** Row positions for each sort order (see ProjectList's `sortable`). */
     orderPublished?: number;
     orderUpdated?: number;
+    /** The post whose art fills the thumbnail (see PostArt). */
+    art?: HeroPost;
     class?: string;
 }
 
-const { title, href, number, pubDate, updatedDate, orderPublished, orderUpdated, class: className } = Astro.props;
+const { title, href, number, pubDate, updatedDate, orderPublished, orderUpdated, art, class: className } = Astro.props;
 const auto = number === undefined;
 const order =
     orderPublished === undefined
@@ -27,15 +33,31 @@ const order =
         : `--order-published:${orderPublished};--order-updated:${orderUpdated ?? orderPublished}`;
 ---
 
-<li class:list={['pli', className]} style={order}>
+<li class:list={['pli', art && 'pli--art', className]} style={order}>
     <a href={href} class='pli__link'>
-        <span class='pli__num' data-auto={auto}>{number}</span>
+        {
+            art ? (
+                <span class='pli__thumb'>
+                    <PostArt post={art} id='thumb' />
+                </span>
+            ) : (
+                <span class='pli__num' data-auto={auto}>
+                    {number}
+                </span>
+            )
+        }
         <span class='pli__body'>
             <span class='pli__title'>{title}</span>
             <span class='pli__desc'><slot /></span>
             {
-                (pubDate || updatedDate) && (
+                (pubDate || updatedDate || (art && number)) && (
                     <span class='pli__meta'>
+                        {art && number && (
+                            <>
+                                {number}
+                                {pubDate && <span aria-hidden='true'> · </span>}
+                            </>
+                        )}
                         {pubDate && <FormattedDate date={pubDate} />}
                         {updatedDate && (
                             <>
@@ -108,6 +130,24 @@ const order =
         letter-spacing: var(--tracking-wide);
     }
 
+    /* With art: a 4:3 thumbnail where the number column was. */
+    .pli--art .pli__link {
+        grid-template-columns: 8rem 1fr 1.5rem;
+        gap: var(--space-6);
+    }
+    .pli__thumb {
+        position: relative;
+        display: block;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-sm);
+    }
+    /* Labels are unreadable at thumbnail size. */
+    .pli__thumb :global(text) {
+        display: none;
+    }
+
     .pli__arrow {
         color: var(--text-subtle);
         font-size: var(--text-lg);
@@ -128,6 +168,10 @@ const order =
         }
         .pli__title {
             font-size: var(--text-lg);
+        }
+        .pli--art .pli__link {
+            grid-template-columns: 5rem 1fr 1.25rem;
+            gap: var(--space-3);
         }
     }
 </style>

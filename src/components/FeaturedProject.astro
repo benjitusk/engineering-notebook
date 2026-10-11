@@ -1,9 +1,13 @@
 ---
+import PostArt from './PostArt.astro';
 import Tags from './Tags.astro';
+import type { HeroPost } from '../lib/art/types';
 
 /**
  * FeaturedProject — the "currently investigating" card. A prominent surface
  * with a project number, title, blurb (slot), optional tags, and a CTA link.
+ * Pass `art` (the post) to show its drawing in a panel on the right, which
+ * moves on top when the card gets narrow.
  *
  * <FeaturedProject number="01" title="Reverse engineering a fingerprint reader"
  *   href="/projects/fingerprint-reader" tags={['Linux', 'I²C', 'USB']}>
@@ -16,13 +20,22 @@ interface Props {
     href: string;
     linkText?: string;
     tags?: string[];
+    /** The post whose art fills the side panel (see PostArt). */
+    art?: HeroPost;
     class?: string;
 }
 
-const { number, title, href, linkText = 'Read the investigation →', tags, class: className } = Astro.props;
+const { number, title, href, linkText = 'Read the investigation →', tags, art, class: className } = Astro.props;
 ---
 
-<article class:list={['featured', className]}>
+<article class:list={['featured', art && 'featured--art', className]}>
+    {
+        art && (
+            <a href={href} class='featured__visual' tabindex='-1' aria-hidden='true'>
+                <PostArt post={art} id='featured' />
+            </a>
+        )
+    }
     <div class='featured__top'>
         {number && <p class='featured__number'>{number}</p>}
         <h2 class='featured__title'>
@@ -95,9 +108,58 @@ const { number, title, href, linkText = 'Read the investigation →', tags, clas
         text-underline-offset: 4px;
     }
 
+    /* With art: text column on the left, drawing panel on the right. */
+    .featured.featured--art {
+        display: grid;
+        grid-template-columns: 1fr 22rem;
+        grid-template-rows: 1fr auto;
+        gap: var(--space-8) 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    .featured--art .featured__top {
+        grid-column: 1;
+        padding: var(--space-8) var(--space-8) 0;
+    }
+    .featured--art .featured__link {
+        grid-column: 1;
+        margin: 0 var(--space-8) var(--space-8);
+    }
+    .featured__visual {
+        position: relative;
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        min-height: 300px;
+        border-left: var(--border-width) solid var(--border);
+    }
+
     @media (max-width: 600px) {
         .featured {
             padding: var(--space-6);
+        }
+    }
+
+    @media (max-width: 760px) {
+        .featured.featured--art {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+            row-gap: 0;
+        }
+        .featured__visual {
+            grid-column: 1;
+            grid-row: 1;
+            min-height: 0;
+            aspect-ratio: 16 / 9;
+            border-left: 0;
+            border-bottom: var(--border-width) solid var(--border);
+        }
+        .featured--art .featured__top {
+            grid-row: 2;
+            padding: var(--space-6) var(--space-6) 0;
+        }
+        .featured--art .featured__link {
+            grid-row: 3;
+            margin: var(--space-8) var(--space-6) var(--space-6);
         }
     }
 </style>
