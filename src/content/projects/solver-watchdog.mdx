@@ -1,0 +1,143 @@
+---
+title: Noticing when a solver dies without saying anything
+description: How ScheduLearn's solver ended up stuck on "Solving" forever after an OOM kill, and the heartbeat and audit chain that now notice when a solve goes silent.
+pubDate: 2026-10-10
+status: In review
+tags: ['GCP', 'Cloud Tasks', 'Firestore', 'Python', 'TypeScript', 'Infrastructure']
+meta:
+    Status: In review
+    Platform: Google Cloud
+    Language: Python / TypeScript
+draft: true
+work: true
+---
+
+import Callout from '../../components/Callout.astro';
+
+## The problem
+
+In [the Google Batch post](/projects/google-batch-solver/) I mentioned that solves for some of our largest schools
+started going offline. The client would sit on "Solving" with no error and no result, and it turned out the solver
+was being OOM-killed. I found that out from the Cloud Run logs.
+
+Giving those schools more memory fixed the OOM kills, but the client would still hang the same way if a solve died
+for any other reason.
+
+Here's how a solve reports its state. When it starts, an instance document in Firestore gets `status: 'running'`, and
+the client listens to that document. When the solver finishes, fails, or gets canceled, it writes the final status
+there, and the client updates. Every one of those exit paths is code in the solver.
+
+A process that gets killed outright never runs any of that code. That includes OOM, a `SIGKILL`, or an instance pulled
+during a deploy. The document says `running` forever, and since the client only reacts to writes, nothing ever tells
+it otherwise.
+
+## A heartbeat
+
+The only way for a process to report its own death is to keep saying "still here" while it's alive, and then stop.
+So the solver now runs a heartbeat on a background thread, writing a timestamp to Firestore on a schedule.
+
+A flat 10-second beat would be the obvious choice, but solves can be configured to run for up to two weeks, and that
+works out to around a hundred thousand writes for one job. The beat backs off as the job ages:
+
+```python
+HEARTBEAT_SCHEDULE: list[tuple[float, float]] = [
+    (1 * _HOUR, 10.0),
+    (10 * _HOUR, 1 * _MINUTE),
+    (24 * _HOUR, 5 * _MINUTE),
+    (2 * _DAY, 10 * _MINUTE),
+    (float("inf"), 15 * _MINUTE),
+]
+```
+
+Someone is usually watching a fresh solve, and nobody is watching one that's been running for a week, so fast beats
+only matter early on.
+
+Each beat also includes the interval it was published at. The audit (below) is written in TypeScript and the
+heartbeat in Python, and I didn't want two copies of this table in two languages that have to agree. If they ever
+disagreed, the audit would start killing healthy solves. With the interval on the beat, the audit doesn't need to know
+the schedule at all.
+
+<Callout variant='failed' title='The first version put the heartbeat on the instance document.'>
+    That's the same document the client listens to, so every beat woke up every listener, including the user's
+    browser, several times a minute. Each wakeup also redelivered whatever the last event on the document was, so the
+    client needed extra code to ignore replays. The heartbeat now goes to its own `solver_heartbeats` collection,
+    which only the server reads.
+</Callout>
+
+## The audit
+
+Something outside the solver has to notice when the beats stop. That's a Cloud Function triggered by Cloud Tasks.
+When a job starts, the server enqueues the first audit, and each audit schedules the next one. Like the heartbeat, the
+audits slow down as the job ages:
+
+| Job age          | Audit every |
+| ---------------- | ----------- |
+| Under 1 hour     | 1 minute    |
+| 1 to 10 hours    | 5 minutes   |
+| 10 to 24 hours   | 15 minutes  |
+| 1 to 2 days      | 30 minutes  |
+| Over 2 days      | 1 hour      |
+
+Each audit reads the latest beat. If the job has been silent for more than six of its own published intervals, the
+audit ends it.
+
+Startup is handled separately, because there's no heartbeat until the solver is actually up. A cold container plus
+loading a big school's data can take a while. After 5 minutes with no beat, the audit flags the job as stalled, and
+the client tells the user and lets them cancel it if they don't want to wait. After 10 minutes, the audit gives up
+and ends it.
+
+There are two more limits. A job still beating after 16 days is longer than any solve can be configured to run, so
+it's an orphan, and the audit ends it. And the chain stops after 2000 audits, which the schedule above should never
+get anywhere near. That one exists because the Firebase emulator ignores the delay on scheduled tasks, so locally the
+chain runs as fast as it can.
+
+The chain also has to survive its own failures. If one audit fails to enqueue the next, supervision for the rest of
+the job just stops. So a failed enqueue now throws, which makes Cloud Tasks retry the audit. Each audit is named after
+the one it schedules, so a retry renews the chain instead of starting a second one.
+
+The solver and the audit live in different codebases. Normally that doesn't matter, because CI deploys both of them
+together whenever `main` or `production` changes. It does matter for a manual deploy. If I ever change where the
+heartbeat gets written and deploy by hand, the audit has to go first and know both locations. Otherwise it would look
+in the wrong place, find no heartbeat, and mark healthy solves as `never_started` after ten minutes.
+
+## Naming how a solve ended
+
+Before this, a solve that crashed and reported it ended as `error`, and a solve that died silently didn't end at
+all. Now a solve ends in one of these:
+
+| Recorded by          | Statuses                                                                  |
+| -------------------- | ------------------------------------------------------------------------- |
+| The solver itself    | `calendar`, `passed_precheck`, `infeasible`, `error`, `cancelled`, `terminated` |
+| The audit, from outside | `deadbeat`, `never_started`                                            |
+
+`error` now means one specific thing: the solver caught a failure and reported it. `deadbeat` means it was beating
+and went silent, which means it was killed, not broken, and in practice that's almost always OOM. `never_started`
+means it never beat at all. Those lead to different advice for the user, so they get different messages in the UI.
+
+On the client, adding a status without giving it a color in the solve list is now a type error, so a new status
+can't ship as an unstyled chip.
+
+## A dead solve has to stay dead
+
+Silence doesn't actually prove a job is dead. The beats could stop because of a wedged gRPC channel, a throttled
+instance, or a network partition, and then the container comes back. By then the audit has already marked the solve
+as dead, and the user has seen that. If the container carried on, it could overwrite the verdict and the user would
+see a solve come back from the dead.
+
+There are three overlapping protections against that:
+
+1. When the audit ends a job, it sets the exit flag the solver already listens to, so the solver stops itself.
+2. Before each beat, the heartbeat checks whether the job is still wanted. That covers the case where the listener
+   from step 1 is what broke.
+3. Every write that could reopen a closed solve is now a Firestore transaction that checks the status first.
+
+<Callout variant='warning' title='The write that says "I am up" could have undone the verdict.'>
+    When the solver starts tracking itself, it writes that it's running. Without the transaction, a solver that came
+    back after being written off would make exactly that write, and reopen a solve the user had already been told was
+    dead.
+</Callout>
+
+<Callout variant='note' label='Status'>
+    The PR is still in review. The audit chain can't be tested properly in the emulator, because of the ignored task
+    delays, so it still needs a run on staging. [TODO: update once it's merged and tested on staging.]
+</Callout>
