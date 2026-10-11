@@ -13,6 +13,8 @@ work: true
 ---
 
 import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+import howManyTimes from '../../assets/projects/solver-watchdog/how-many-times.jpg';
 
 ## The problem
 
@@ -123,6 +125,12 @@ Silence doesn't actually prove a job is dead. The beats could stop because of a 
 instance, or a network partition, and then the container comes back. By then the audit has already marked the solve
 as dead, and the user has seen that. If the container carried on, it could overwrite the verdict and the user would
 see a solve come back from the dead.
+
+<Figure
+    src={howManyTimes}
+    alt='Jafar from Aladdin, gripping his snake staff and scowling, with the auto-generated caption "how many times do i have to kill you boy [Music]".'
+    width={1440}
+/>
 
 There are three overlapping protections against that:
 
