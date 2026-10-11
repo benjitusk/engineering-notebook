@@ -10,7 +10,8 @@ import { renderPostCard } from '../../../lib/og/post-card.js';
  * priority over the catch-all text cards in ../[...route].ts.
  */
 export const getStaticPaths = (async () => {
-    const posts = await getCollection('projects');
+    // Drafts get a card in `astro dev` only, matching their pages in ../../projects/[...slug].astro.
+    const posts = await getCollection('projects', (post) => import.meta.env.DEV || !post.data.draft);
     return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }) satisfies GetStaticPaths;
 

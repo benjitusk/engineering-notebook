@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # hero figure previews (npm run hero)
 .hero-preview/
+
+.claude/settings.local.json
