@@ -3,21 +3,49 @@ import { AUTHOR_NAME, BRAND_SUBTITLE } from '../consts';
 
 /**
  * Branding — the top-left identity. The name is itself the home link, so this
- * must not be wrapped in another <a>. Name + subordinate mono subtitle.
+ * must not be wrapped in another <a>. The mark (the engineering center-of-mass
+ * symbol), then the name over a subordinate mono subtitle.
  */
 ---
 
 <a class='branding' href='/' aria-label={`${AUTHOR_NAME} — home`}>
-    <span class='branding__name'>{AUTHOR_NAME}</span>
-    <span class='branding__subtitle'>{BRAND_SUBTITLE}</span>
+    <svg class='branding__mark' viewBox='0 0 64 64' aria-hidden='true'>
+        <path class='branding__fill' d='M32 32V15A17 17 0 0 1 49 32ZM32 32V49A17 17 0 0 1 15 32Z'></path>
+        <path class='branding__ink' stroke-width='2.5' d='M32 6V58M6 32H58'></path>
+        <circle class='branding__ink' stroke-width='4' cx='32' cy='32' r='17'></circle>
+    </svg>
+    <span class='branding__text'>
+        <span class='branding__name'>{AUTHOR_NAME}</span>
+        <span class='branding__subtitle'>{BRAND_SUBTITLE}</span>
+    </span>
 </a>
 
 <style>
     .branding {
         display: inline-flex;
-        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
         line-height: var(--leading-none);
         text-decoration: none;
+    }
+
+    .branding__mark {
+        flex: none;
+        width: 32px;
+        height: 32px;
+    }
+    .branding__ink {
+        fill: none;
+        stroke: var(--text);
+        stroke-linecap: round;
+    }
+    .branding__fill {
+        fill: var(--accent);
+    }
+
+    .branding__text {
+        display: inline-flex;
+        flex-direction: column;
     }
 
     .branding__name {
@@ -39,5 +67,27 @@ import { AUTHOR_NAME, BRAND_SUBTITLE } from '../consts';
         font-weight: var(--weight-medium);
         text-transform: uppercase;
         letter-spacing: var(--tracking-widest);
+    }
+
+    /* On phones the mark stands in for the subtitle, so the header fits. */
+    @media (max-width: 480px) {
+        .branding {
+            gap: var(--space-2);
+        }
+        .branding__mark {
+            width: 28px;
+            height: 28px;
+        }
+        .branding__name {
+            white-space: nowrap;
+        }
+        .branding__subtitle {
+            display: none;
+        }
+    }
+    @media (max-width: 360px) {
+        .branding__name {
+            white-space: normal;
+        }
     }
 </style>
