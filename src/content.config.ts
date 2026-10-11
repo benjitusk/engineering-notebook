@@ -38,6 +38,8 @@ const projects = defineCollection({
             meta: z.record(z.string(), z.string()).optional(),
             /** Hide from indexes / listings while drafting. */
             draft: z.boolean().optional(),
+            /** List in the home page's "Production work" section (write-ups of shipped work). */
+            work: z.boolean().optional(),
         }),
 });
 

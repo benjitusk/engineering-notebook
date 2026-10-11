@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../components/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Eyebrow from '../components/Eyebrow.astro';
@@ -8,6 +9,11 @@ import ProjectList from '../components/ProjectList.astro';
 import ProjectListItem from '../components/ProjectListItem.astro';
 import Prose from '../components/Prose.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+// Write-ups of shipped work, newest first. Opt in with `work: true` in a post's frontmatter.
+const work = (await getCollection('projects'))
+    .filter((post) => post.data.work && !post.data.draft)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} width='page'>
@@ -23,6 +29,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             they're capable of.
         </p>
     </Hero>
+
+    {
+        work.length > 0 && (
+            <Section label='Production work'>
+                <ProjectList>
+                    {work.map((post) => (
+                        <ProjectListItem title={post.data.title} href={`/projects/${post.id}/`} pubDate={post.data.pubDate}>
+                            {post.data.description}
+                        </ProjectListItem>
+                    ))}
+                </ProjectList>
+            </Section>
+        )
+    }
 
     <Section label='Currently investigating'>
         <FeaturedProject

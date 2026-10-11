@@ -273,6 +273,7 @@ meta:                        # → <MetaTable>, in this order
     Platform: Linux
     Language: Rust
 draft: false                 # hide from indexes while true
+work: true                   # list in the home page's "Production work" section
 ---
 ```
 
