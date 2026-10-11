@@ -1,11 +1,17 @@
 // @ts-check
-// "Last updated" for project posts, computed from git: the date of the most
-// recent commit that touched the post's file.
+// Dates for project posts that come from git.
 //
+// "Last updated": the date of the most recent commit that touched the post's file.
 //   - `updatedDate` in frontmatter always wins.
 //   - Uncommitted edits fall back to the file's modification time, so drafts
 //     in progress show a sensible date locally.
-//   - Edits within a day of publishing don't count as an update.
+//   - Edits within a day of publishing don't count as an update. "Publishing"
+//     is the later of `pubDate` and the post's first commit: `pubDate` has no
+//     time, so it reads as midnight UTC, and an evening commit on the same day
+//     would otherwise count as an update.
+//
+// Publish order: newest `pubDate` first; posts published the same day are
+// ordered by their first commit (see `comparePublished`).
 //
 // Build-time only — it shells out to git, and CI must check out full history
 // (see `fetch-depth` in .github/workflows). Without git, posts simply have no
@@ -19,6 +25,8 @@ const MIN_GAP_MS = 24 * 60 * 60 * 1000;
 
 /** @type {Map<string, Date> | undefined} */
 let commitDates;
+/** Each file's oldest commit. @type {Map<string, Date>} */
+let firstCommitDates = new Map();
 /** @type {Set<string>} */
 let editedFiles = new Set();
 
@@ -43,8 +51,10 @@ function load() {
     for (const line of log.split('\n')) {
         if (line.startsWith('\0')) {
             commitDate = new Date(line.slice(1));
-        } else if (line && commitDate && !commitDates.has(line)) {
-            commitDates.set(line, commitDate);
+        } else if (line && commitDate) {
+            if (!commitDates.has(line)) commitDates.set(line, commitDate);
+            // Newest first, so the last date seen for a file is its first commit.
+            firstCommitDates.set(line, commitDate);
         }
     }
 
@@ -80,5 +90,31 @@ export function lastUpdated({ id, data }) {
     const edited = editedFiles.has(file) ? new Date(fs.statSync(file).mtimeMs) : commitDates?.get(file);
     if (!edited) return undefined;
 
-    return edited.valueOf() - data.pubDate.valueOf() >= MIN_GAP_MS ? edited : undefined;
+    const published = Math.max(data.pubDate.valueOf(), firstCommitDates.get(file)?.valueOf() ?? 0);
+    return edited.valueOf() - published >= MIN_GAP_MS ? edited : undefined;
+}
+
+/**
+ * When the post's file was first committed. Uncommitted posts count as now.
+ * @param {string} id
+ */
+function firstCommitted(id) {
+    const file = postFile(id);
+    load();
+    const first = file ? firstCommitDates.get(file) : undefined;
+    return first ? first.valueOf() : Date.now();
+}
+
+/**
+ * Sort comparator for newest-first publish order. Ties on `pubDate` (it has no
+ * time of day) go to the post committed later.
+ * @param {{ id: string, data: { pubDate: Date } }} a
+ * @param {{ id: string, data: { pubDate: Date } }} b
+ */
+export function comparePublished(a, b) {
+    return (
+        b.data.pubDate.valueOf() - a.data.pubDate.valueOf() ||
+        firstCommitted(b.id) - firstCommitted(a.id) ||
+        a.id.localeCompare(b.id)
+    );
 }

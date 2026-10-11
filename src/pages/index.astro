@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../components/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Eyebrow from '../components/Eyebrow.astro';
@@ -8,12 +8,16 @@ import FeaturedProject from '../components/FeaturedProject.astro';
 import ProjectList from '../components/ProjectList.astro';
 import ProjectListItem from '../components/ProjectListItem.astro';
 import Prose from '../components/Prose.astro';
+import { comparePublished } from '../lib/post-dates.js';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 // Write-ups of shipped work, newest first. Opt in with `work: true` in a post's frontmatter.
 const work = (await getCollection('projects'))
     .filter((post) => post.data.work && !post.data.draft)
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    .sort(comparePublished);
+
+// The featured card shows this post's art.
+const featured = await getEntry('projects', 'fingerprint-reader');
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} width='page'>
@@ -35,7 +39,12 @@ const work = (await getCollection('projects'))
             <Section label='Production work'>
                 <ProjectList>
                     {work.map((post) => (
-                        <ProjectListItem title={post.data.title} href={`/projects/${post.id}/`} pubDate={post.data.pubDate}>
+                        <ProjectListItem
+                            title={post.data.title}
+                            href={`/projects/${post.id}/`}
+                            pubDate={post.data.pubDate}
+                            art={{ ...post.data, slug: post.id }}
+                        >
                             {post.data.description}
                         </ProjectListItem>
                     ))}
@@ -50,6 +59,7 @@ const work = (await getCollection('projects'))
             title='Reverse engineering a Windows Hello fingerprint reader'
             href='/projects/fingerprint-reader'
             tags={['Reverse engineering', 'Linux', 'I²C', 'USB']}
+            art={featured && { ...featured.data, slug: featured.id }}
         >
             I wanted to use a fingerprint reader designed for Windows Hello on Linux, so I'm figuring out how the
             hardware communicates, what the Windows driver is doing, and what it would take to support it properly.

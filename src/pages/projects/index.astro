@@ -7,7 +7,7 @@ import Section from '../../components/Section.astro';
 import ProjectList from '../../components/ProjectList.astro';
 import ProjectListItem from '../../components/ProjectListItem.astro';
 import ProjectSort from '../../components/ProjectSort.tsx';
-import { lastUpdated } from '../../lib/post-dates.js';
+import { comparePublished, lastUpdated } from '../../lib/post-dates.js';
 import { SITE_TITLE } from '../../consts';
 
 const entries = (await getCollection('projects'))
@@ -18,7 +18,7 @@ type Entry = (typeof entries)[number];
 const touched = (entry: Entry) => (entry.updated ?? entry.post.data.pubDate).valueOf();
 
 // The list is rendered in publish order; the sort control reorders it with CSS.
-const byPublished = [...entries].sort((a, b) => b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf());
+const byPublished = [...entries].sort((a, b) => comparePublished(a.post, b.post));
 const updatedOrder = new Map(
     [...entries].sort((a, b) => touched(b) - touched(a)).map((entry, index) => [entry.post.id, index])
 );
@@ -62,6 +62,7 @@ const updatedOrder = new Map(
                         updatedDate={updated}
                         orderPublished={index}
                         orderUpdated={updatedOrder.get(post.id)}
+                        art={{ ...post.data, slug: post.id }}
                     >
                         {post.data.description}
                     </ProjectListItem>
