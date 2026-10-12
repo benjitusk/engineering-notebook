@@ -1,6 +1,6 @@
 ---
 title: Moving our biggest schedules to Google Batch
-description: Why ScheduLearn's largest schools outgrew Cloud Functions and Cloud Run, what it took to run the solver on Google Batch, and two defaults that would have quietly wasted the hardware.
+description: Why ScheduLearn's largest schools outgrew Cloud Functions and Cloud Run, what it took to run the solver on Google Batch, and two Batch defaults that give the solver much less of the machine than you're paying for.
 pubDate: 2026-10-10
 status: Production
 tags: ['GCP', 'Google Batch', 'Cloud Run', 'Cloud Functions', 'CP-SAT', 'Infrastructure']
@@ -24,31 +24,30 @@ The scheduling itself is a constraint model built on Google OR-Tools' CP-SAT sol
 lead the design of that model. My part is everything around it: where the solver runs, how it gets started and
 stopped, and how its progress gets back to the person waiting in the browser.
 
-This post is about where the solver runs, and what happened when some schools got big enough that it stopped being
-a boring question.
+This post is about where the solver runs, and what we did when our biggest schools outgrew the setup we had.
 
 ## How we got here
 
 The solver has moved a few times already.
 
-**AWS Lightsail.** The first version was a server on Lightsail that was always running. The browser sent a solve
+The first version was a server on AWS Lightsail that was always running. The browser sent a solve
 request over HTTP, and the server held the connection open until it had a result. That stopped working once solves
 started taking more than an hour (this was before we overhauled the backend's efficiency), because the HTTP
 connection would time out first.
 
-**WebSockets.** We switched to WebSockets, which got around the timeout, but we still weren't happy with the setup.
+We switched to WebSockets, which got around the timeout, but we still weren't happy with the setup.
 
-**Cloud Run.** Then we moved to GCP and ran each solve as a Cloud Run job. That worked well, because it scaled:
+Then we moved to GCP and ran each solve as a Cloud Run job. That worked well, because it scaled:
 every solve got its own container. The downside was startup time. Every solve waited about 3 minutes for a container
 to be provisioned before the solver even started.
 
-**Cloud Functions and Cloud Run.** Since February 2025, the browser calls a Firebase Cloud Function, which sends the
+Since February 2025, the browser calls a Firebase Cloud Function, which sends the
 solve to one of two places based on its time limit (the scheduler sets this in the editor):
 
-- **Up to 45 minutes:** a Cloud Function, which runs the entire solve inside a single HTTP request on 8 vCPUs and
+- Solves of up to 45 minutes go to a Cloud Function, which runs the entire solve inside a single HTTP request on 8 vCPUs and
   16 GB of memory. Cloud Functions time out at 60 minutes, so the cutoff leaves some margin. There's no container to
   provision, so it starts in under a second.
-- **Over 45 minutes:** a Cloud Run job, on 8 vCPUs and 32 GB. The function starts the job, saves its ID so we can
+- Longer solves go to a Cloud Run job, on 8 vCPUs and 32 GB. The function starts the job, saves its ID so we can
   cancel it later, and returns right away. The solver reports progress through Firestore while it runs.
 
 This worked fine for most schools, but not for the biggest ones.
@@ -109,10 +108,10 @@ const [response] = await batchClient.createJob({
 });
 ```
 
-Most of that is what you'd expect. Two of those fields were not obvious to me at first, and both exist because
-without them the job runs on far less hardware than you think you asked for.
+Two of those fields, `computeResource` and `machineType`, weren't obvious to me at first. Without them, the job runs
+on much less hardware than you think you asked for.
 
-## Default 1: a big VM doesn't mean a big task
+## The task doesn't get the whole VM
 
 <Callout variant='warning' title='Left unset, Batch gives your task 2 CPUs and 2 GB, no matter how big the VM is.'>
     If you don't set `computeResource`, Batch falls back to its default task budget of 2000 milliCPU and 2000 MiB.
@@ -122,8 +121,8 @@ without them the job runs on far less hardware than you think you asked for.
 This one is sneaky, because nothing fails. You'd ask for a 32-core VM, pay for a 32-core VM, and give the solver a
 small slice of it.
 
-So `cpuMilli` and `memoryMib` aren't something the caller passes in. They're derived from the machine type, from one
-table, so the machine and the task budget can't disagree:
+So the caller doesn't pass in `cpuMilli` and `memoryMib`. Both come from the machine type, using one table, so the
+task budget always matches the machine:
 
 ```ts
 export const BATCH_MACHINES = {
@@ -140,7 +139,7 @@ export const BATCH_MACHINES = {
 The machine type is also checked against this table inside the Cloud Function before anything is sent to Google.
 A typo there would otherwise show up as a vague provisioning failure several minutes later.
 
-## Default 2: not all vCPUs are cores
+## Not all vCPUs are cores
 
 On most Compute Engine machine families, a vCPU is a hyperthread
 (<abbr title="Simultaneous multithreading">SMT</abbr>), so two vCPUs share one physical core and its
@@ -156,8 +155,8 @@ families. The `check` job (the infeasibility check) is single-threaded, so it ge
 Pinning the machine type matters for the same reason. If you leave it out, Batch picks a shape for you, and early on
 that's how our jobs ended up on whatever general-purpose machine happened to fit.
 
-I haven't benchmarked this. I haven't run the same school on an SMT machine with the same vCPU count, so the
-reasoning above is a hypothesis and not a measured result.
+I haven't benchmarked this, though. Until I run the same school on an SMT machine with the same vCPU count, the
+reasoning above is just a hypothesis.
 
 ## Smaller things that broke
 
@@ -168,12 +167,12 @@ reasoning above is a hypothesis and not a measured result.
     `jobs/jobs` in it. The fix was to pass just the region as the parent.
 </Callout>
 
-- **Auth.** The solver container authenticates to Firebase with the VM's service account, so jobs now run as a
+- The solver container authenticates to Firebase with the VM's service account, so jobs now run as a
   dedicated solver service account with the `cloud-platform` scope. Without that scope, the VM gets the restricted
   default Compute Engine scopes and the IAM roles on the account don't apply.
-- **Cancellation.** Canceling a Batch job needed its own path, separate from Cloud Run's, including treating
+- Canceling a Batch job needed its own path, separate from Cloud Run's, including treating
   "already finished" as a normal outcome instead of an error.
-- **Timeouts.** There are now two limits. The solver gets a time budget and stops cleanly when it runs out, writing
+- There are now two time limits. The solver gets a time budget and stops cleanly when it runs out, writing
   out the best schedule it has. Five minutes later, `maxRunDuration` kills the VM if it hasn't stopped.
 
 ## Results
