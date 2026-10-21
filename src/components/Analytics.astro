@@ -14,14 +14,17 @@
  *
  * The Umami script is only rendered in production builds with
  * PUBLIC_UMAMI_WEBSITE_ID set. In `astro dev`, events go to console.debug.
+ * PUBLIC_UMAMI_SCRIPT_URL points at a self-hosted Umami; it defaults to
+ * Umami Cloud.
  */
 const websiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+const scriptUrl = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL || 'https://cloud.umami.is/script.js';
 const enabled = import.meta.env.PROD && Boolean(websiteId);
 ---
 
 {
     enabled && (
-        <script is:inline id='umami-script' defer src='https://cloud.umami.is/script.js' data-website-id={websiteId} />
+        <script is:inline id='umami-script' defer src={scriptUrl} data-website-id={websiteId} />
     )
 }
 

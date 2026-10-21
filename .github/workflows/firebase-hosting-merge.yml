@@ -40,6 +40,7 @@ jobs:
           AUTHOR_EMAIL: ${{ secrets.AUTHOR_EMAIL }}
           # Not a secret (it ships in every page), so it's a repository variable.
           PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
+          PUBLIC_UMAMI_SCRIPT_URL: ${{ vars.PUBLIC_UMAMI_SCRIPT_URL }}
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
