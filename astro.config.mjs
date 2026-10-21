@@ -72,5 +72,15 @@ export default defineConfig({
             subsets: ['latin'],
             fallbacks: ['ui-monospace', 'monospace'],
         },
+        // Thoughts' headline face, for the footer link to it (ThoughtsLink.astro).
+        {
+            provider: fontProviders.google(),
+            name: 'Fraunces',
+            cssVariable: '--font-fraunces',
+            weights: [600],
+            styles: ['normal'],
+            subsets: ['latin'],
+            fallbacks: ['Georgia', 'serif'],
+        },
     ],
 });

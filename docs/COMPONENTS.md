@@ -46,6 +46,23 @@ narrative markup on a page.
 
 ---
 
+### `ThoughtsLink`
+
+The footer link to [Thoughts](https://thoughts.benjitusk.com), the sibling essay
+blog, dressed in that site's brand so it stands out from the notebook's own
+links: a terracotta pill with the "b" mark, the name in Fraunces, and the line
+"essays · objections welcome". No props.
+
+The mark sends out a slow ripple while idle. On hover or keyboard focus, the
+pill lifts, the mark tips, a hand-drawn underline draws in, the arrow nudges,
+and an "I object!" sticky note springs from behind the corner. All of it stops
+under `prefers-reduced-motion`. On phones the footer gives it a full-width row
+of its own.
+
+```astro
+<ThoughtsLink />
+```
+
 ## Notebook vocabulary
 
 ### `Eyebrow`

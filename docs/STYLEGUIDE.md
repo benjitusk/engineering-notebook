@@ -76,6 +76,7 @@ There is no global "utilities" soup and no Tailwind.
 | `--example`         | `#67588F` | Worked examples / specimens **only**       |
 | `--example-subtle`  | `#F2F0F7` | Example washes                             |
 | `--code-background` | `#ECEDEA` | Code / technical surfaces                  |
+| `--thoughts*`        | `#B34A31` | Thoughts' brand, for `<ThoughtsLink>` **only** |
 
 ### Typography
 
@@ -129,6 +130,12 @@ Colour carries meaning here. Use it by what the thing **is**, not by taste.
 | Confirmed / passed / done                 | Green    | `--success` | Markdown callouts          |
 | Error / hazard / bug                      | Red      | `--danger`  | Markdown callouts          |
 | Worked example / specimen                 | Violet   | `--example` | Markdown callouts          |
+| Thoughts, the sibling essay blog           | Terracotta | `--thoughts*` | `<ThoughtsLink>` only     |
+
+The terracotta isn't the notebook's: it's Thoughts' brand, borrowed so the link
+to that site looks like it. Along with `--font-thoughts` (Fraunces),
+`--radius-pill` and `--ease-spring`, it's a deliberate exception to the
+notebook's look — never reach for any of them anywhere else.
 
 This maps directly onto `<Callout variant="…">` — see below. The blue is an
 accent, not the primary text colour; if a page looks blue, pull it back.

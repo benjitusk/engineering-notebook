@@ -1,0 +1,183 @@
+---
+import { THOUGHTS_URL } from '../consts';
+
+/**
+ * ThoughtsLink — the link to Thoughts, the sibling essay blog, dressed in that
+ * site's brand so it stands apart from the notebook's own links: a terracotta
+ * pill with Thoughts' "b" mark, set in Fraunces.
+ *
+ * Motion (all of it stops under prefers-reduced-motion, via base.css):
+ *   idle   the mark sends out a slow ripple, like a notification
+ *   hover  the pill lifts and warms, the mark tips its hat, a hand-drawn
+ *          underline draws itself under the name, the arrow nudges forward,
+ *          and an "I object!" sticky note springs out from behind the corner
+ *          (objections in the margin are what the blog is about)
+ */
+---
+
+<a class='thoughts-link' href={THOUGHTS_URL} aria-label='Thoughts: essays by Benji Tusk, objections welcome'>
+    <span class='thoughts-link__mark' aria-hidden='true'>b</span>
+    <span class='thoughts-link__text' aria-hidden='true'>
+        <span class='thoughts-link__name'>
+            Thoughts
+            <svg class='thoughts-link__squiggle' viewBox='0 0 100 8' preserveAspectRatio='none'>
+                <path pathLength='1' d='M1 5 C 18 1, 32 8, 50 4.5 S 82 1.5, 99 5'></path>
+            </svg>
+        </span>
+        <span class='thoughts-link__tag'>essays · objections welcome</span>
+    </span>
+    <span class='thoughts-link__arrow' aria-hidden='true'>→</span>
+    <span class='thoughts-link__note' aria-hidden='true'>I object!</span>
+</a>
+
+<style>
+    .thoughts-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+        border: var(--border-width) solid color-mix(in srgb, var(--thoughts) 30%, transparent);
+        border-radius: var(--radius-pill);
+        background: var(--thoughts-subtle);
+        color: var(--text);
+        line-height: var(--leading-none);
+        text-decoration: none;
+        transition:
+            transform var(--duration) var(--ease-spring),
+            box-shadow var(--duration) var(--ease),
+            border-color var(--duration) var(--ease);
+    }
+    .thoughts-link:hover,
+    .thoughts-link:focus-visible {
+        color: var(--text);
+        border-color: var(--thoughts);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--thoughts) 70%, transparent);
+    }
+
+    /* The mark: Thoughts' terracotta dot with a soft "b". */
+    .thoughts-link__mark {
+        position: relative;
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 30px;
+        height: 30px;
+        padding-bottom: 2px;
+        border-radius: 50%;
+        background: var(--thoughts);
+        color: var(--thoughts-on);
+        font-family: var(--font-thoughts);
+        font-size: var(--text-base);
+        font-weight: var(--weight-semibold);
+        transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    .thoughts-link__mark::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 2px solid var(--thoughts);
+        border-radius: 50%;
+        opacity: 0;
+        animation: thoughts-ripple 3.6s var(--ease) 1s infinite;
+    }
+    .thoughts-link:hover .thoughts-link__mark,
+    .thoughts-link:focus-visible .thoughts-link__mark {
+        transform: rotate(-14deg) scale(1.08);
+    }
+
+    .thoughts-link__text {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    .thoughts-link__name {
+        position: relative;
+        width: fit-content;
+        font-family: var(--font-thoughts);
+        font-size: var(--text-md);
+        font-weight: var(--weight-semibold);
+        letter-spacing: var(--tracking-tight);
+    }
+    .thoughts-link__tag {
+        color: var(--text-muted);
+        font-size: var(--text-2xs);
+    }
+
+    /* The hand-drawn underline: drawn in on hover, rubbed out on leave. */
+    .thoughts-link__squiggle {
+        position: absolute;
+        left: -2%;
+        bottom: -5px;
+        width: 104%;
+        height: 6px;
+        overflow: visible;
+    }
+    .thoughts-link__squiggle path {
+        fill: none;
+        stroke: var(--thoughts);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        vector-effect: non-scaling-stroke;
+        transition: stroke-dashoffset var(--duration-slow) var(--ease);
+    }
+    .thoughts-link:hover .thoughts-link__squiggle path,
+    .thoughts-link:focus-visible .thoughts-link__squiggle path {
+        stroke-dashoffset: 0;
+    }
+
+    .thoughts-link__arrow {
+        color: var(--thoughts);
+        font-size: var(--text-base);
+        transition: transform var(--duration-slow) var(--ease-spring);
+    }
+    .thoughts-link:hover .thoughts-link__arrow,
+    .thoughts-link:focus-visible .thoughts-link__arrow {
+        transform: translateX(4px);
+    }
+
+    /* The objection: a sticky note tucked behind the pill's corner. */
+    .thoughts-link__note {
+        position: absolute;
+        top: -14px;
+        right: -18px;
+        z-index: 1;
+        padding: var(--space-1) var(--space-2);
+        border: var(--border-width) solid var(--thoughts-note-border);
+        border-radius: var(--radius);
+        background: var(--thoughts-note);
+        color: var(--thoughts-note-text);
+        font-size: var(--text-2xs);
+        font-weight: var(--weight-semibold);
+        white-space: nowrap;
+        box-shadow: 0 4px 10px -6px color-mix(in srgb, var(--thoughts-note-text) 60%, transparent);
+        opacity: 0;
+        transform: translate(-10px, 10px) rotate(0deg) scale(0.6);
+        transform-origin: bottom left;
+        pointer-events: none;
+        transition:
+            opacity var(--duration) var(--ease),
+            transform var(--duration-slow) var(--ease-spring);
+    }
+    .thoughts-link:hover .thoughts-link__note,
+    .thoughts-link:focus-visible .thoughts-link__note {
+        opacity: 1;
+        transform: translate(0, 0) rotate(8deg) scale(1);
+        transition-delay: 80ms;
+    }
+
+    @keyframes thoughts-ripple {
+        0% {
+            opacity: 0.55;
+            transform: scale(1);
+        }
+        45%,
+        100% {
+            opacity: 0;
+            transform: scale(1.9);
+        }
+    }
+</style>

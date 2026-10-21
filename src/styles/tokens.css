@@ -60,6 +60,16 @@
     /* ---- Palette: code / technical surfaces --------------------------- */
     --code-background: #ecedea;
 
+    /* ---- Palette: Thoughts (the sibling essay blog) -------------------- */
+    /* Its brand, borrowed for links to it (<ThoughtsLink>). ONLY there.    */
+    --thoughts: #b34a31;
+    --thoughts-hover: #943b26;
+    --thoughts-subtle: #f7e6dd;
+    --thoughts-on: #fffdf8; /* text on --thoughts                            */
+    --thoughts-note: #fbf0c9; /* the objection sticky note                  */
+    --thoughts-note-border: #eadb9f;
+    --thoughts-note-text: #5b4a12;
+
     /* ---- Notebook grid (consumed by notebook.css) --------------------- */
     --grid-line: rgba(53, 106, 138, 0.035); /* 32px major grid             */
     --grid-line-faint: rgba(53, 106, 138, 0.015); /* 8px minor grid        */
@@ -70,6 +80,8 @@
        astro.config.mjs; the --font-plex-* vars come from Astro's font API. */
     --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
     --font-mono: var(--font-plex-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+    /* Fraunces — Thoughts' headline face. Only for <ThoughtsLink>.          */
+    --font-thoughts: var(--font-fraunces), Georgia, serif;
 
     /* ---- Typography: scale -------------------------------------------- */
     --text-2xs: 0.6875rem; /* 11px — micro labels                          */
@@ -125,6 +137,7 @@
     --radius-sm: 2px;
     --radius: 4px;
     --radius-md: 8px;
+    --radius-pill: 999px; /* Thoughts' rounder world — <ThoughtsLink> only   */
 
     /* ---- Borders ------------------------------------------------------ */
     --border-width: 1px;
@@ -133,6 +146,8 @@
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
     --duration-fast: 150ms;
     --duration: 180ms;
+    --duration-slow: 320ms;
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot */
 
     /* ---- Layout ------------------------------------------------------- */
     --measure-prose: 720px; /* long-form reading column                    */
@@ -210,6 +225,13 @@
         --example: #a797cf;
         --example-subtle: #252130;
         --code-background: #232629;
+        --thoughts: #e38a6d;
+        --thoughts-hover: #f0a68d;
+        --thoughts-subtle: #3b2720;
+        --thoughts-on: #1d1a16;
+        --thoughts-note: #3a3420;
+        --thoughts-note-border: #5a5230;
+        --thoughts-note-text: #f3e3a6;
         --grid-line: rgba(111, 163, 194, 0.05);
         --grid-line-faint: rgba(111, 163, 194, 0.025);
     }
