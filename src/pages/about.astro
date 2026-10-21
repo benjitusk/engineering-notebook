@@ -4,7 +4,7 @@ import Hero from '../components/Hero.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Prose from '../components/Prose.astro';
 import EmailLink from '../components/EmailLink.astro';
-import { GITHUB_URL } from '../consts';
+import { GITHUB_URL, THOUGHTS_URL } from '../consts';
 ---
 
 <BaseLayout title='About · Benji Tusk' description='About Benji Tusk and this engineering notebook.' width='prose'>
@@ -32,7 +32,9 @@ import { GITHUB_URL } from '../consts';
         </p>
         <p>
             More recently I've started getting into reverse engineering: figuring out how undocumented hardware,
-            protocols, and firmware work, and getting them to do things they weren't built to do. Right now that's a{' '}
+            protocols, and firmware work, and getting them to do things they weren't built to do. Right now that's a{
+                ' '
+            }
             <a href='/projects/fingerprint-reader/'>Windows-only fingerprint reader</a> I'm trying to get working on Linux.
             Those projects come with even less certainty about how they'll turn out, which makes them a good fit for this
             notebook.
@@ -45,6 +47,11 @@ import { GITHUB_URL } from '../consts';
             ends, and investigations that don't have an ending yet. I explain why in <a href='/projects/notebook-init/'
                 >my first post</a
             >.
+        </p>
+        <p>
+            Not every question I think about compiles. Those questions, about God, judgment, peoplehood, and language,
+            go on <a href={THOUGHTS_URL}>Thoughts</a>, my second notebook. The essays there take a position, say how
+            sure I am, and say what would change my mind.
         </p>
 
         <h2>Get in touch</h2>
