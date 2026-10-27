@@ -27,7 +27,18 @@ export default defineConfig({
         og(),
         editor?.default({
             shell: './src/mdx-editor/Shell.astro',
-            collections: { projects: { pageUrl: (/** @type {string} */ id) => `/projects/${id}/` } },
+            collections: {
+                projects: {
+                    pageUrl: (/** @type {string} */ id) => `/projects/${id}/`,
+                    // "New project" in the editor's index: a draft dated today.
+                    newEntry: (/** @type {string} */ title) => ({
+                        title,
+                        description: '',
+                        pubDate: new Date(),
+                        draft: true,
+                    }),
+                },
+            },
             // The same catalogs as satteriEmoji, and the custom callouts below.
             emoji: { shortcodes: ['github', 'cldr'] },
             callouts: [...editor.DEFAULT_CALLOUT_TYPES, 'console'],
