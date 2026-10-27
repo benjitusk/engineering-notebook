@@ -15,15 +15,17 @@ interface Props {
     updatedDate?: Date;
     tags?: string[];
     meta?: Record<string, string>;
+    /** In the editor, the title edits the frontmatter in place (astro-mdx-editor). */
+    editing?: boolean;
 }
 
-const { title, number, pubDate, updatedDate, tags, meta } = Astro.props;
+const { title, number, pubDate, updatedDate, tags, meta, editing } = Astro.props;
 ---
 
 <header class='project-header'>
     <Eyebrow>{number ? `Project / ${number}` : 'Notebook entry'}</Eyebrow>
 
-    <h1 class='project-header__title'>{title}</h1>
+    <h1 class='project-header__title' data-mdx-field={editing ? 'title' : undefined}>{title}</h1>
 
     {
         pubDate && (

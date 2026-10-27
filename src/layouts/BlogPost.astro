@@ -6,9 +6,14 @@ import Figure from '../components/Figure.astro';
 import PostHero from '../components/PostHero.astro';
 import Prose from '../components/Prose.astro';
 
-type Props = CollectionEntry<'projects'>['data'] & { slug: string };
+type Props = CollectionEntry<'projects'>['data'] & {
+    slug: string;
+    /** Rendered around the live-preview editor (src/mdx-editor/Shell.astro). */
+    editing?: boolean;
+};
 
-const { slug, title, description, pubDate, updatedDate, heroImage, hero, number, tags, status, meta } = Astro.props;
+const { slug, title, description, pubDate, updatedDate, heroImage, hero, number, tags, status, meta, editing } =
+    Astro.props;
 ---
 
 <BaseLayout
@@ -25,6 +30,7 @@ const { slug, title, description, pubDate, updatedDate, heroImage, hero, number,
             updatedDate={updatedDate}
             tags={tags}
             meta={meta}
+            editing={editing}
         />
 
         {

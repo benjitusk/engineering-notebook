@@ -8,6 +8,15 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+## Editing in the browser
+
+With the dev server running, `/__edit` opens a live-preview editor for any project (`/__edit/projects/<slug>`).
+It's the `astro-mdx-editor` integration, loaded from a sibling checkout (`../astro-mdx-editor`) only when that
+folder exists, so CI and other machines build without it. It saves the `.mdx` file exactly as typed. The editor
+renders inside `src/mdx-editor/Shell.astro`, which wraps it in the real `BlogPost` layout (`editing` mode, where
+the title edits the frontmatter in place). Pasted or dropped images are saved to `src/assets/projects/<slug>/`
+and inserted as an import plus a `<Figure>`; the snippet is in `astro.config.mjs`.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

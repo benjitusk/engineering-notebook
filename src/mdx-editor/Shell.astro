@@ -1,0 +1,28 @@
+---
+/**
+ * Shell — the page chrome around the editor at /__edit/projects/<slug> (dev only, astro-mdx-editor).
+ * The editor renders into the slot, inside the real BlogPost layout and Prose, so it looks like the
+ * published page while you type.
+ */
+import { getEntry } from 'astro:content';
+import BlogPost from '../layouts/BlogPost.astro';
+import { lastUpdated } from '../lib/post-dates.js';
+
+interface Props {
+    collection: string;
+    id: string;
+}
+
+const { id } = Astro.props;
+const post = await getEntry('projects', id);
+---
+
+{
+    post ? (
+        <BlogPost {...post.data} slug={post.id} updatedDate={lastUpdated(post)} editing>
+            <slot />
+        </BlogPost>
+    ) : (
+        <slot />
+    )
+}

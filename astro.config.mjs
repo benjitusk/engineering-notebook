@@ -9,12 +9,38 @@ import satteriCallouts from 'satteri-callouts';
 import { satteriEmoji } from 'satteri-emoji';
 import react from '@astrojs/react';
 import og from 'astro-og';
+import { existsSync } from 'node:fs';
+
+// Dev-only live-preview editor at /__edit, from a sibling checkout of astro-mdx-editor. It isn't a
+// dependency: where that folder doesn't exist (CI, other machines), the site builds without it.
+const editorEntry = new URL('../astro-mdx-editor/src/index.ts', import.meta.url);
+const editor = existsSync(editorEntry) ? await import(editorEntry.href) : null;
 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://notebook.benjitusk.com',
     // astro-og: dev toolbar app that previews each page's social share card.
-    integrations: [mdx(), sitemap(), react(), og()],
+    integrations: [
+        mdx(),
+        sitemap(),
+        react(),
+        og(),
+        editor?.default({
+            shell: './src/mdx-editor/Shell.astro',
+            collections: { projects: { pageUrl: (/** @type {string} */ id) => `/projects/${id}/` } },
+            // The same catalogs as satteriEmoji, and the custom callouts below.
+            emoji: { shortcodes: ['github', 'cldr'] },
+            callouts: [...editor.DEFAULT_CALLOUT_TYPES, 'console'],
+            // Pasted and dropped images are imported and shown in a Figure, as written by hand.
+            images: {
+                dir: 'src/assets/projects/{id}',
+                snippet: (/** @type {{ path: string, alt: string, ident: string }} */ { path, alt, ident }) => ({
+                    imports: [`import Figure from '../../components/Figure.astro';`, `import ${ident} from '${path}';`],
+                    markup: `<Figure\n    src={${ident}}\n    alt='${alt}'\n/>`,
+                }),
+            },
+        }),
+    ].filter(Boolean),
 
     vite: {
         plugins: [tailwindcss()],
