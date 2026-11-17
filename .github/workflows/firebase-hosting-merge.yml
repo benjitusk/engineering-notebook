@@ -45,6 +45,6 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BENJITUSK_ENGINEERING_NOTEBOOK }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BENJITUSK }}
           channelId: live
-          projectId: benjitusk-engineering-notebook
+          projectId: benjitusk
