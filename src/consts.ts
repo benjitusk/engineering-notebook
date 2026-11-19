@@ -10,6 +10,8 @@ export const BRAND_SUBTITLE = 'Engineering Notebook';
 
 // External / social links. Update GITHUB_URL to your handle.
 export const GITHUB_URL = 'https://github.com/benjitusk';
+/** benjitusk.com: the author's home page, credited as the author in structured data. */
+export const HOME_URL = 'https://benjitusk.com';
 /** Thoughts, the sibling blog for essays (repo: benjitusk/thoughts). */
 export const THOUGHTS_URL = 'https://thoughts.benjitusk.com';
 export const RSS_PATH = '/rss.xml';

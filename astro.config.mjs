@@ -9,12 +9,26 @@ import satteriCallouts from 'satteri-callouts';
 import { satteriEmoji } from 'satteri-emoji';
 import react from '@astrojs/react';
 import og from 'astro-og';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 // Dev-only live-preview editor at /__edit, from a sibling checkout of astro-mdx-editor. It isn't a
 // dependency: where that folder doesn't exist (CI, other machines), the site builds without it.
 const editorEntry = new URL('../astro-mdx-editor/src/index.ts', import.meta.url);
 const editor = existsSync(editorEntry) ? await import(editorEntry.href) : null;
+
+// A page's sitemap <lastmod> is the date in its own <head> (article:modified_time, else
+// article:published_time), read back from the built HTML so the two never disagree. The sitemap
+// is written after every page, so the files are there. Pages without a date get no <lastmod>.
+const outDir = new URL('./dist/', import.meta.url);
+/** @param {import('@astrojs/sitemap').SitemapItem} item */
+function withLastmod(item) {
+    const file = new URL(`.${new URL(item.url).pathname}index.html`, outDir);
+    if (!existsSync(file)) return item;
+    const head = readFileSync(file, 'utf8');
+    const date = (/property="article:modified_time" content="([^"]+)"/.exec(head) ??
+        /property="article:published_time" content="([^"]+)"/.exec(head))?.[1];
+    return date ? { ...item, lastmod: date } : item;
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,7 +36,7 @@ export default defineConfig({
     // astro-og: dev toolbar app that previews each page's social share card.
     integrations: [
         mdx(),
-        sitemap(),
+        sitemap({ serialize: withLastmod }),
         react(),
         og(),
         editor?.default({
